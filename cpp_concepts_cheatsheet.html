@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C++ Concepts Cheat Sheet</title>
+<style>
+  :root {
+    --bg: #0f1117; --bg2: #161b22; --bg3: #1c2128; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --green: #3fb950; --orange: #d29922; --red: #f85149; --purple: #bc8cff;
+    --teal: #39d353; --yellow: #e3b341; --pink: #ff7b72; --cyan: #79c0ff;
+    --tag-mem:  #1f3a2a; --tag-mem-t:  #3fb950;
+    --tag-ptr:  #1a2f4a; --tag-ptr-t:  #58a6ff;
+    --tag-cast: #3a1f1f; --tag-cast-t: #f85149;
+    --tag-lam:  #2e2416; --tag-lam-t:  #d29922;
+    --tag-file: #261a3a; --tag-file-t: #bc8cff;
+    --tag-str:  #1a2e2e; --tag-str-t:  #39d353;
+    --tag-misc: #2a1f2e; --tag-misc-t: #ff7b72;
+    --tag-tip:  #2a2416; --tag-tip-t:  #e3b341;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, 'Segoe UI', sans-serif; font-size: 13px; line-height: 1.5; }
+
+  .header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 20px 28px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
+  .header h1 { font-size: 20px; font-weight: 600; color: var(--text); }
+  .header p { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .legend { display: flex; gap: 8px; flex-wrap: wrap; }
+  .lbadge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+
+  .nav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; gap: 0; flex-wrap: wrap; }
+  .nav a { display: block; padding: 10px 14px; font-size: 12px; color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent; white-space: nowrap; transition: color 0.15s; }
+  .nav a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .main { max-width: 1400px; margin: 0 auto; padding: 24px 28px; }
+
+  .section { margin-bottom: 32px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .section-header { background: var(--bg2); padding: 12px 18px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .section-header h2 { font-size: 15px; font-weight: 600; color: var(--text); }
+  .section-note { padding: 8px 18px 10px; background: var(--bg3); font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); line-height: 1.7; }
+
+  .ops-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+  .op-block { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 14px 16px; }
+  .op-block.wide { grid-column: 1 / -1; border-right: none; }
+  @media (max-width: 700px) { .ops-grid { grid-template-columns: 1fr; } .op-block { border-right: none; } }
+
+  .op-label { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; letter-spacing: 0.02em; }
+  .b-mem  { background: var(--tag-mem);  color: var(--tag-mem-t);  }
+  .b-ptr  { background: var(--tag-ptr);  color: var(--tag-ptr-t);  }
+  .b-cast { background: var(--tag-cast); color: var(--tag-cast-t); }
+  .b-lam  { background: var(--tag-lam);  color: var(--tag-lam-t);  }
+  .b-file { background: var(--tag-file); color: var(--tag-file-t); }
+  .b-str  { background: var(--tag-str);  color: var(--tag-str-t);  }
+  .b-misc { background: var(--tag-misc); color: var(--tag-misc-t); }
+  .b-tip  { background: var(--tag-tip);  color: var(--tag-tip-t);  }
+
+  pre { font-family: 'Courier New', monospace; font-size: 11.5px; line-height: 1.8; white-space: pre; overflow-x: auto; }
+  .kw  { color: #ff7b72; }
+  .fn  { color: #d2a8ff; }
+  .ty  { color: #a5d6ff; }
+  .cm  { color: #6e7681; font-style: italic; }
+  .nm  { color: #79c0ff; }
+  .op  { color: #ffa657; }
+  .st  { color: #a5d6ff; }
+
+  .warn { color: #f85149; font-weight: 600; }
+  .good { color: #3fb950; font-weight: 600; }
+
+  .footer { margin-top: 24px; padding: 16px 18px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; font-size: 11px; color: var(--muted); line-height: 1.9; }
+  .footer strong { color: var(--text); }
+  .footer code { color: var(--accent); font-family: 'Courier New', monospace; }
+
+  @media print { body { background: white; color: #111; } .nav { display: none; } pre { font-size: 10px; } .section { break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>C++ Concepts &amp; Syntax — Complete Cheat Sheet</h1>
+    <p>Memory · Smart Pointers · Casting · Lambdas · File I/O · String Parsing · LeetCode Patterns</p>
+  </div>
+  <div class="legend">
+    <span class="lbadge b-mem">MEMORY</span>
+    <span class="lbadge b-ptr">SMART PTR</span>
+    <span class="lbadge b-cast">CAST</span>
+    <span class="lbadge b-lam">LAMBDA</span>
+    <span class="lbadge b-file">FILE I/O</span>
+    <span class="lbadge b-str">STRING</span>
+    <span class="lbadge b-misc">MISC</span>
+    <span class="lbadge b-tip">TIP</span>
+  </div>
+</div>
+
+<div class="nav">
+  <a href="#memory">Memory Management</a>
+  <a href="#smartptr">Smart Pointers</a>
+  <a href="#casting">Casting</a>
+  <a href="#lambda">Lambda Functions</a>
+  <a href="#fileio">File I/O</a>
+  <a href="#strparse">String Parsing</a>
+  <a href="#templates">Templates</a>
+  <a href="#concurrency">Concurrency</a>
+  <a href="#leetcode">LeetCode Patterns</a>
+</div>
+
+<div class="main">
+
+<!-- ══════════════════════════════════════ MEMORY MANAGEMENT ══════ -->
+<div class="section" id="memory">
+  <div class="section-header">
+    <h2>Memory Management</h2>
+    <span style="font-size:11px;color:var(--muted);">Stack · Heap · new/delete · Placement new · Alignment</span>
+  </div>
+  <div class="ops-grid">
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-mem">PRIMITIVE TYPES — STACK</span></div>
+      <pre>
+<span class="cm">// Uninitialized (undefined value — dangerous!)</span>
+<span class="kw">int</span> a;
+<span class="kw">double</span> d;
+<span class="kw">char</span> c;
+
+<span class="cm">// Zero / value initialized</span>
+<span class="kw">int</span> b = <span class="nm">0</span>;
+<span class="kw">int</span> b2{};              <span class="cm">// zero-init (C++11)</span>
+<span class="kw">int</span> b3 = <span class="kw">int</span>();        <span class="cm">// zero-init</span>
+
+<span class="cm">// Direct / copy / list init</span>
+<span class="kw">int</span> x(<span class="nm">42</span>);             <span class="cm">// direct</span>
+<span class="kw">int</span> y = <span class="nm">42</span>;            <span class="cm">// copy</span>
+<span class="kw">int</span> z{<span class="nm">42</span>};             <span class="cm">// list (prevents narrowing)</span>
+
+<span class="cm">// Constants</span>
+<span class="kw">const</span> <span class="kw">int</span> MAX = <span class="nm">100</span>;
+<span class="kw">constexpr</span> <span class="kw">int</span> N = <span class="nm">1</span> <span class="op">&lt;&lt;</span> <span class="nm">20</span>;  <span class="cm">// compile-time</span>
+
+<span class="cm">// Type aliases</span>
+<span class="kw">using</span> ll = <span class="kw">long long</span>;
+<span class="kw">typedef</span> <span class="kw">unsigned</span> <span class="kw">int</span> uint;
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-mem">ARRAYS — STACK &amp; HEAP</span></div>
+      <pre>
+<span class="cm">// Stack arrays (fixed size, fast)</span>
+<span class="kw">int</span> arr[<span class="nm">5</span>];               <span class="cm">// uninitialized</span>
+<span class="kw">int</span> arr2[<span class="nm">5</span>] = {};         <span class="cm">// all zeros</span>
+<span class="kw">int</span> arr3[<span class="nm">5</span>] = {<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>};   <span class="cm">// {1,2,3,0,0}</span>
+<span class="kw">int</span> arr4[] = {<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>};    <span class="cm">// size deduced = 3</span>
+
+<span class="cm">// 2D stack array</span>
+<span class="kw">int</span> grid[<span class="nm">3</span>][<span class="nm">4</span>] = {};      <span class="cm">// 3x4 zeros</span>
+
+<span class="cm">// Heap array (dynamic size)</span>
+<span class="kw">int</span><span class="op">*</span> p = <span class="kw">new</span> <span class="kw">int</span>[<span class="nm">10</span>];     <span class="cm">// uninitialized</span>
+<span class="kw">int</span><span class="op">*</span> q = <span class="kw">new</span> <span class="kw">int</span>[<span class="nm">10</span>]();   <span class="cm">// zero-initialized</span>
+<span class="kw">int</span><span class="op">*</span> r = <span class="kw">new</span> <span class="kw">int</span>[<span class="nm">10</span>]{<span class="nm">1</span>,<span class="nm">2</span>};<span class="cm">// {1,2,0,0,...}</span>
+<span class="kw">delete</span>[] p;               <span class="cm">// MUST use delete[]</span>
+
+<span class="cm">// 2D heap array</span>
+<span class="kw">int</span><span class="op">**</span> mat = <span class="kw">new</span> <span class="kw">int</span><span class="op">*</span>[<span class="nm">3</span>];
+<span class="kw">for</span>(<span class="kw">int</span> i=<span class="nm">0</span>;i&lt;<span class="nm">3</span>;i++) mat[i] = <span class="kw">new</span> <span class="kw">int</span>[<span class="nm">4</span>]();
+<span class="kw">for</span>(<span class="kw">int</span> i=<span class="nm">0</span>;i&lt;<span class="nm">3</span>;i++) <span class="kw">delete</span>[] mat[i];
+<span class="kw">delete</span>[] mat;
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-mem">STRUCTS — ALL INIT STYLES</span></div>
+      <pre>
+<span class="kw">struct</span> <span class="ty">Point</span> {
+    <span class="kw">int</span> x, y;
+};
+
+<span class="kw">struct</span> <span class="ty">Node</span> {
+    <span class="kw">int</span> val;
+    <span class="ty">Node</span><span class="op">*</span> next;
+    <span class="ty">Node</span>(<span class="kw">int</span> v) : val(v), next(<span class="kw">nullptr</span>) {}
+    <span class="ty">Node</span>(<span class="kw">int</span> v, <span class="ty">Node</span><span class="op">*</span> n) : val(v), next(n) {}
+};
+
+<span class="cm">// Aggregate init (no constructor)</span>
+<span class="ty">Point</span> p1 = {<span class="nm">1</span>, <span class="nm">2</span>};
+<span class="ty">Point</span> p2{<span class="nm">3</span>, <span class="nm">4</span>};            <span class="cm">// C++11</span>
+<span class="ty">Point</span> p3;                  <span class="cm">// uninitialized members!</span>
+<span class="ty">Point</span> p4 = {};             <span class="cm">// zero all members</span>
+<span class="ty">Point</span> p5{};                <span class="cm">// zero all members</span>
+
+<span class="cm">// Designated initializers (C++20)</span>
+<span class="ty">Point</span> p6 = {.x=<span class="nm">1</span>, .y=<span class="nm">2</span>};
+
+<span class="cm">// Heap allocation</span>
+<span class="ty">Node</span><span class="op">*</span> n1 = <span class="kw">new</span> <span class="ty">Node</span>(<span class="nm">5</span>);
+<span class="ty">Node</span><span class="op">*</span> n2 = <span class="kw">new</span> <span class="ty">Node</span>{<span class="nm">5</span>, <span class="kw">nullptr</span>};
+<span class="kw">delete</span> n1;  <span class="kw">delete</span> n2;
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-mem">CLASSES — ALL INIT STYLES</span></div>
+      <pre>
+<span class="kw">class</span> <span class="ty">MyClass</span> {
+<span class="kw">public</span>:
+    <span class="kw">int</span> val;
+    <span class="ty">std::string</span> name;
+    <span class="kw">static int</span> count;     <span class="cm">// shared across all instances</span>
+
+    <span class="cm">// Default constructor</span>
+    <span class="ty">MyClass</span>() : val(<span class="nm">0</span>), name(<span class="st">"default"</span>) {}
+
+    <span class="cm">// Parameterized</span>
+    <span class="ty">MyClass</span>(<span class="kw">int</span> v, <span class="ty">std::string</span> n)
+        : val(v), name(<span class="fn">std::move</span>(n)) {}
+
+    <span class="cm">// Copy constructor</span>
+    <span class="ty">MyClass</span>(<span class="kw">const</span> <span class="ty">MyClass</span><span class="op">&amp;</span> o)
+        : val(o.val), name(o.name) {}
+
+    <span class="cm">// Move constructor (C++11)</span>
+    <span class="ty">MyClass</span>(<span class="ty">MyClass</span><span class="op">&amp;&amp;</span> o) <span class="kw">noexcept</span>
+        : val(o.val), name(<span class="fn">std::move</span>(o.name)) {}
+};
+
+<span class="cm">// Instantiation styles</span>
+<span class="ty">MyClass</span> a;                 <span class="cm">// default ctor</span>
+<span class="ty">MyClass</span> b(<span class="nm">5</span>, <span class="st">"hi"</span>);        <span class="cm">// direct init</span>
+<span class="ty">MyClass</span> c = <span class="ty">MyClass</span>(<span class="nm">5</span>,<span class="st">"x"</span>); <span class="cm">// copy init</span>
+<span class="ty">MyClass</span> d{<span class="nm">5</span>, <span class="st">"hi"</span>};        <span class="cm">// list init (C++11)</span>
+<span class="ty">MyClass</span><span class="op">*</span> e = <span class="kw">new</span> <span class="ty">MyClass</span>(<span class="nm">5</span>, <span class="st">"hi"</span>);
+<span class="kw">delete</span> e;
+<span class="kw">auto</span> f = <span class="ty">MyClass</span>(<span class="nm">5</span>, <span class="st">"hi"</span>);  <span class="cm">// type deduced</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-mem">new / delete PATTERNS</span></div>
+      <pre>
+<span class="cm">// Single object</span>
+<span class="kw">int</span><span class="op">*</span> p = <span class="kw">new</span> <span class="kw">int</span>;          <span class="cm">// uninitialized</span>
+<span class="kw">int</span><span class="op">*</span> q = <span class="kw">new</span> <span class="kw">int</span>(<span class="nm">42</span>);      <span class="cm">// initialized to 42</span>
+<span class="kw">int</span><span class="op">*</span> r = <span class="kw">new</span> <span class="kw">int</span>();         <span class="cm">// zero-initialized</span>
+<span class="kw">delete</span> p;  <span class="kw">delete</span> q;  <span class="kw">delete</span> r;
+
+<span class="cm">// Array</span>
+<span class="kw">int</span><span class="op">*</span> arr = <span class="kw">new</span> <span class="kw">int</span>[<span class="nm">10</span>];
+<span class="kw">delete</span>[] arr;              <span class="cm">// [] is mandatory for arrays</span>
+
+<span class="cm">// nothrow (returns nullptr on failure)</span>
+<span class="kw">int</span><span class="op">*</span> s = <span class="kw">new</span>(<span class="fn">std::nothrow</span>) <span class="kw">int</span>[<span class="nm">10000000</span>];
+<span class="kw">if</span> (!s) { <span class="cm">/* handle failure */</span> }
+
+<span class="cm">// Placement new (construct at existing memory)</span>
+<span class="kw">char</span> buf[<span class="kw">sizeof</span>(<span class="kw">int</span>)];
+<span class="kw">int</span><span class="op">*</span> t = <span class="kw">new</span>(buf) <span class="kw">int</span>(<span class="nm">99</span>); <span class="cm">// no heap alloc!</span>
+t<span class="op">-&gt;</span><span class="op">~</span><span class="ty">int</span>();                  <span class="cm">// explicit destructor call</span>
+
+<span class="cm">// Safe delete pattern</span>
+<span class="kw">delete</span> p; p = <span class="kw">nullptr</span>;    <span class="cm">// prevent dangling ptr</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-mem">RULE OF 3/5/0</span></div>
+      <pre>
+<span class="kw">class</span> <span class="ty">Buffer</span> {
+    <span class="kw">int</span><span class="op">*</span> data;
+    <span class="kw">int</span> size;
+<span class="kw">public</span>:
+    <span class="ty">Buffer</span>(<span class="kw">int</span> n) : data(<span class="kw">new</span> <span class="kw">int</span>[n]), size(n) {}
+
+    <span class="cm">// Destructor</span>
+    <span class="op">~</span><span class="ty">Buffer</span>() { <span class="kw">delete</span>[] data; }
+
+    <span class="cm">// Copy constructor (deep copy)</span>
+    <span class="ty">Buffer</span>(<span class="kw">const</span> <span class="ty">Buffer</span><span class="op">&amp;</span> o)
+        : data(<span class="kw">new</span> <span class="kw">int</span>[o.size]), size(o.size) {
+        <span class="fn">std::copy</span>(o.data, o.data+o.size, data);
+    }
+
+    <span class="cm">// Copy assignment</span>
+    <span class="ty">Buffer</span><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">=</span>(<span class="kw">const</span> <span class="ty">Buffer</span><span class="op">&amp;</span> o) {
+        <span class="kw">if</span>(<span class="kw">this</span> <span class="op">==</span> <span class="op">&amp;</span>o) <span class="kw">return</span> <span class="op">*</span><span class="kw">this</span>;
+        <span class="kw">delete</span>[] data;
+        data = <span class="kw">new</span> <span class="kw">int</span>[o.size];
+        size = o.size;
+        <span class="fn">std::copy</span>(o.data, o.data+o.size, data);
+        <span class="kw">return</span> <span class="op">*</span><span class="kw">this</span>;
+    }
+
+    <span class="cm">// Move constructor (C++11, steal resources)</span>
+    <span class="ty">Buffer</span>(<span class="ty">Buffer</span><span class="op">&amp;&amp;</span> o) <span class="kw">noexcept</span>
+        : data(o.data), size(o.size)
+    { o.data = <span class="kw">nullptr</span>; o.size = <span class="nm">0</span>; }
+
+    <span class="cm">// Move assignment</span>
+    <span class="ty">Buffer</span><span class="op">&amp;</span> <span class="kw">operator</span><span class="op">=</span>(<span class="ty">Buffer</span><span class="op">&amp;&amp;</span> o) <span class="kw">noexcept</span> {
+        <span class="kw">if</span>(<span class="kw">this</span> <span class="op">==</span> <span class="op">&amp;</span>o) <span class="kw">return</span> <span class="op">*</span><span class="kw">this</span>;
+        <span class="kw">delete</span>[] data;
+        data = o.data; size = o.size;
+        o.data = <span class="kw">nullptr</span>; o.size = <span class="nm">0</span>;
+        <span class="kw">return</span> <span class="op">*</span><span class="kw">this</span>;
+    }
+};
+<span class="cm">// Rule of 0: use smart ptrs — no manual copy/move needed</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-mem">STACK vs HEAP SUMMARY</span></div>
+      <pre>
+<span class="cm">// ── STACK ───────────────────────────────</span>
+<span class="cm">// Automatic lifetime (freed when scope ends)</span>
+<span class="cm">// Fast allocation (just move stack pointer)</span>
+<span class="cm">// Size must be known at compile time</span>
+{
+    <span class="kw">int</span> x = <span class="nm">5</span>;           <span class="cm">// lives on stack</span>
+    <span class="kw">int</span> arr[<span class="nm">100</span>];        <span class="cm">// stack array, fixed</span>
+}   <span class="cm">// x, arr automatically freed here</span>
+
+<span class="cm">// ── HEAP ────────────────────────────────</span>
+<span class="cm">// Manual lifetime (new/delete)</span>
+<span class="cm">// Slower allocation (OS involved)</span>
+<span class="cm">// Dynamic size possible</span>
+<span class="kw">int</span><span class="op">*</span> p = <span class="kw">new</span> <span class="kw">int</span>(<span class="nm">5</span>);    <span class="cm">// heap, stays until deleted</span>
+<span class="kw">delete</span> p;               <span class="cm">// must free manually</span>
+
+<span class="cm">// ── COMMON PITFALLS ──────────────────────</span>
+<span class="cm">// Memory leak:  new without delete</span>
+<span class="cm">// Double free:  delete called twice</span>
+<span class="cm">// Dangling ptr: use after delete</span>
+<span class="cm">// Buffer overrun: write past allocated size</span>
+<span class="cm">// Use smart pointers to avoid all of these!</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-mem">MEMORY UTILITIES</span></div>
+      <pre>
+<span class="cm">// memset / memcpy / memmove</span>
+<span class="kw">int</span> a[<span class="nm">5</span>];
+<span class="fn">memset</span>(a, <span class="nm">0</span>, <span class="kw">sizeof</span>(a));       <span class="cm">// fill bytes with 0</span>
+<span class="fn">memset</span>(a, <span class="op">-</span><span class="nm">1</span>, <span class="kw">sizeof</span>(a));      <span class="cm">// fill with 0xFF (all bits 1)</span>
+<span class="fn">memcpy</span>(dst, src, <span class="nm">5</span><span class="op">*</span><span class="kw">sizeof</span>(<span class="kw">int</span>));<span class="cm">// copy 20 bytes (no overlap)</span>
+<span class="fn">memmove</span>(dst,src,<span class="nm">5</span><span class="op">*</span><span class="kw">sizeof</span>(<span class="kw">int</span>));<span class="cm">// safe even if overlap</span>
+
+<span class="cm">// sizeof / alignof</span>
+<span class="kw">sizeof</span>(<span class="kw">int</span>)           <span class="cm">// 4 bytes</span>
+<span class="kw">sizeof</span>(<span class="kw">long long</span>)     <span class="cm">// 8 bytes</span>
+<span class="kw">sizeof</span>(arr)/<span class="kw">sizeof</span>(arr[<span class="nm">0</span>])  <span class="cm">// array length</span>
+<span class="kw">alignof</span>(<span class="kw">double</span>)       <span class="cm">// alignment requirement = 8</span>
+
+<span class="cm">// std::fill / std::memset equivalents</span>
+<span class="fn">std::fill</span>(a, a+<span class="nm">5</span>, <span class="nm">0</span>);           <span class="cm">// preferred for non-POD</span>
+<span class="fn">std::fill_n</span>(a, <span class="nm">5</span>, <span class="nm">42</span>);
+
+<span class="cm">// Aligned allocation (C++17)</span>
+<span class="kw">void</span><span class="op">*</span> p = <span class="fn">std::aligned_alloc</span>(<span class="nm">64</span>, <span class="nm">512</span>);
+<span class="fn">std::free</span>(p);
+      </pre>
+    </div>
+
+  </div>
+  <div class="section-note">
+    ⚠ <strong>Always pair new↔delete and new[]↔delete[].</strong> Mixing them is undefined behavior. Prefer smart pointers (below) to eliminate manual memory management entirely.
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ SMART POINTERS ══════════ -->
+<div class="section" id="smartptr">
+  <div class="section-header">
+    <h2>Smart Pointers</h2>
+    <span style="font-size:11px;color:var(--muted);">#include &lt;memory&gt; · unique_ptr · shared_ptr · weak_ptr</span>
+  </div>
+  <div class="ops-grid">
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-ptr">unique_ptr — EXCLUSIVE OWNERSHIP</span></div>
+      <pre>
+<span class="cm">// Creation — prefer make_unique (C++14)</span>
+<span class="kw">auto</span> p1 = <span class="fn">std::make_unique</span>&lt;<span class="kw">int</span>&gt;(<span class="nm">42</span>);
+<span class="kw">auto</span> p2 = <span class="fn">std::make_unique</span>&lt;<span class="ty">Node</span>&gt;(<span class="nm">5</span>);
+<span class="kw">auto</span> p3 = <span class="fn">std::make_unique</span>&lt;<span class="kw">int</span>[]&gt;(<span class="nm">10</span>); <span class="cm">// array</span>
+
+<span class="cm">// From raw pointer (avoid if possible)</span>
+<span class="fn">std::unique_ptr</span>&lt;<span class="kw">int</span>&gt; p4(<span class="kw">new</span> <span class="kw">int</span>(<span class="nm">10</span>));
+
+<span class="cm">// Access</span>
+<span class="op">*</span>p1                    <span class="cm">// dereference: 42</span>
+p2<span class="op">-&gt;</span>val                <span class="cm">// member access</span>
+p1.<span class="fn">get</span>()               <span class="cm">// raw pointer (don't delete!)</span>
+p3[<span class="nm">0</span>]                  <span class="cm">// array element</span>
+
+<span class="cm">// Ownership transfer (move-only)</span>
+<span class="kw">auto</span> p5 = <span class="fn">std::move</span>(p1); <span class="cm">// p1 is now null</span>
+<span class="fn">someFunc</span>(<span class="fn">std::move</span>(p5)); <span class="cm">// transfer to function</span>
+
+<span class="cm">// Release / reset</span>
+<span class="kw">int</span><span class="op">*</span> raw = p1.<span class="fn">release</span>(); <span class="cm">// give up ownership</span>
+p2.<span class="fn">reset</span>();             <span class="cm">// destroy held object</span>
+p2.<span class="fn">reset</span>(<span class="kw">new</span> <span class="ty">Node</span>(<span class="nm">9</span>)); <span class="cm">// destroy old, own new</span>
+
+<span class="cm">// Null check</span>
+<span class="kw">if</span> (p1) { <span class="cm">/* not null */</span> }
+<span class="kw">if</span> (p1 <span class="op">!=</span> <span class="kw">nullptr</span>) { <span class="cm">/* same */</span> }
+
+<span class="cm">// Custom deleter</span>
+<span class="kw">auto</span> del = [](<span class="kw">int</span><span class="op">*</span> p){ <span class="cm">/* custom cleanup */</span> <span class="kw">delete</span> p; };
+<span class="fn">std::unique_ptr</span>&lt;<span class="kw">int</span>, <span class="kw">decltype</span>(del)&gt; p6(<span class="kw">new</span> <span class="kw">int</span>, del);
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-ptr">shared_ptr — SHARED OWNERSHIP</span></div>
+      <pre>
+<span class="cm">// Creation — prefer make_shared (single allocation)</span>
+<span class="kw">auto</span> s1 = <span class="fn">std::make_shared</span>&lt;<span class="kw">int</span>&gt;(<span class="nm">42</span>);
+<span class="kw">auto</span> s2 = <span class="fn">std::make_shared</span>&lt;<span class="ty">Node</span>&gt;(<span class="nm">5</span>);
+
+<span class="cm">// From raw pointer</span>
+<span class="fn">std::shared_ptr</span>&lt;<span class="kw">int</span>&gt; s3(<span class="kw">new</span> <span class="kw">int</span>(<span class="nm">10</span>));
+
+<span class="cm">// Copy — both own the object</span>
+<span class="kw">auto</span> s4 = s1;            <span class="cm">// ref count = 2</span>
+<span class="fn">std::shared_ptr</span>&lt;<span class="kw">int</span>&gt; s5 = s1;
+
+<span class="cm">// Access (same as unique_ptr)</span>
+<span class="op">*</span>s1                      <span class="cm">// dereference</span>
+s2<span class="op">-&gt;</span>val                  <span class="cm">// member</span>
+s1.<span class="fn">get</span>()                 <span class="cm">// raw pointer</span>
+
+<span class="cm">// Reference counting</span>
+s1.<span class="fn">use_count</span>()           <span class="cm">// number of owners</span>
+s1.<span class="fn">unique</span>()              <span class="cm">// true if only owner</span>
+
+<span class="cm">// Reset</span>
+s1.<span class="fn">reset</span>();              <span class="cm">// release ownership</span>
+s1.<span class="fn">reset</span>(<span class="kw">new</span> <span class="kw">int</span>(<span class="nm">99</span>));  <span class="cm">// own new object</span>
+
+<span class="cm">// Custom deleter</span>
+<span class="fn">std::shared_ptr</span>&lt;<span class="ty">FILE</span>&gt; fp(
+    <span class="fn">fopen</span>(<span class="st">"f.txt"</span>,<span class="st">"r"</span>), <span class="fn">fclose</span>);
+<span class="cm">// fclose called automatically!</span>
+
+<span class="cm">// Aliasing constructor</span>
+<span class="fn">std::shared_ptr</span>&lt;<span class="kw">int</span>&gt; alias(s2, <span class="op">&amp;</span>s2<span class="op">-&gt;</span>val);
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-ptr">weak_ptr — BREAK CYCLES</span></div>
+      <pre>
+<span class="cm">// weak_ptr doesn't own — doesn't affect ref count</span>
+<span class="cm">// Use to break shared_ptr circular references</span>
+
+<span class="kw">auto</span> s = <span class="fn">std::make_shared</span>&lt;<span class="kw">int</span>&gt;(<span class="nm">42</span>);
+<span class="fn">std::weak_ptr</span>&lt;<span class="kw">int</span>&gt; w = s;  <span class="cm">// ref count still 1</span>
+
+<span class="cm">// Check if object is alive</span>
+w.<span class="fn">expired</span>()              <span class="cm">// true if object is gone</span>
+w.<span class="fn">use_count</span>()            <span class="cm">// shared owners (not weak)</span>
+
+<span class="cm">// Safely access object — lock() returns shared_ptr</span>
+<span class="kw">if</span> (<span class="kw">auto</span> locked = w.<span class="fn">lock</span>()) {
+    cout <span class="op">&lt;&lt;</span> <span class="op">*</span>locked;       <span class="cm">// safe: object alive</span>
+} <span class="kw">else</span> {
+    <span class="cm">// object was destroyed</span>
+}
+
+<span class="cm">// Classic circular reference problem</span>
+<span class="kw">struct</span> <span class="ty">NodeA</span> {
+    <span class="fn">std::shared_ptr</span>&lt;<span class="ty">NodeB</span>&gt; b;  <span class="cm">// shared → cycle!</span>
+};
+<span class="kw">struct</span> <span class="ty">NodeA</span> {
+    <span class="fn">std::weak_ptr</span>&lt;<span class="ty">NodeB</span>&gt; b;    <span class="cm">// weak → no cycle</span>
+};
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-ptr">SMART PTR PATTERNS &amp; CASTING</span></div>
+      <pre>
+<span class="cm">// Passing smart pointers to functions</span>
+<span class="kw">void</span> <span class="fn">take</span>(<span class="fn">std::unique_ptr</span>&lt;<span class="kw">int</span>&gt; p);    <span class="cm">// takes ownership</span>
+<span class="kw">void</span> <span class="fn">use</span>(<span class="kw">const</span> <span class="fn">std::unique_ptr</span>&lt;<span class="kw">int</span>&gt;<span class="op">&amp;</span> p); <span class="cm">// borrow, no transfer</span>
+<span class="kw">void</span> <span class="fn">peek</span>(<span class="kw">int</span><span class="op">*</span> p);                    <span class="cm">// pass raw with .get()</span>
+
+<span class="cm">// Returning from factory functions</span>
+<span class="fn">std::unique_ptr</span>&lt;<span class="ty">Base</span>&gt; <span class="fn">make</span>() {
+    <span class="kw">return</span> <span class="fn">std::make_unique</span>&lt;<span class="ty">Derived</span>&gt;();
+}
+
+<span class="cm">// Casting shared_ptr</span>
+<span class="fn">std::shared_ptr</span>&lt;<span class="ty">Base</span>&gt; base = <span class="fn">std::make_shared</span>&lt;<span class="ty">Derived</span>&gt;();
+<span class="kw">auto</span> derived = <span class="fn">std::static_pointer_cast</span>&lt;<span class="ty">Derived</span>&gt;(base);
+<span class="kw">auto</span> derived2 = <span class="fn">std::dynamic_pointer_cast</span>&lt;<span class="ty">Derived</span>&gt;(base);
+<span class="kw">auto</span> c = <span class="fn">std::const_pointer_cast</span>&lt;<span class="ty">Base</span>&gt;(constBase);
+
+<span class="cm">// unique_ptr in containers</span>
+<span class="fn">std::vector</span>&lt;<span class="fn">std::unique_ptr</span>&lt;<span class="ty">Node</span>&gt;&gt; nodes;
+nodes.<span class="fn">push_back</span>(<span class="fn">std::make_unique</span>&lt;<span class="ty">Node</span>&gt;(<span class="nm">1</span>));
+nodes.<span class="fn">emplace_back</span>(<span class="kw">new</span> <span class="ty">Node</span>(<span class="nm">2</span>));
+
+<span class="cm">// enable_shared_from_this</span>
+<span class="kw">struct</span> <span class="ty">Foo</span> : <span class="fn">std::enable_shared_from_this</span>&lt;<span class="ty">Foo</span>&gt; {
+    <span class="fn">std::shared_ptr</span>&lt;<span class="ty">Foo</span>&gt; <span class="fn">self</span>() {
+        <span class="kw">return</span> <span class="fn">shared_from_this</span>();
+    }
+};
+      </pre>
+    </div>
+
+  </div>
+  <div class="section-note">
+    <strong>Quick rule:</strong> Use <code>unique_ptr</code> by default. Use <code>shared_ptr</code> only when multiple owners are truly needed. Use <code>weak_ptr</code> to break cycles. Never call <code>delete</code> on a raw pointer that a smart pointer also manages.
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ CASTING ═════════════════ -->
+<div class="section" id="casting">
+  <div class="section-header">
+    <h2>Casting</h2>
+    <span style="font-size:11px;color:var(--muted);">static_cast · dynamic_cast · const_cast · reinterpret_cast · Numeric · String conversions</span>
+  </div>
+  <div class="ops-grid">
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-cast">static_cast</span></div>
+      <pre>
+<span class="cm">// Safe compile-time cast between related types</span>
+<span class="cm">// No runtime check — your responsibility!</span>
+
+<span class="cm">// Numeric conversions</span>
+<span class="kw">double</span> d = <span class="nm">3.14</span>;
+<span class="kw">int</span> i = <span class="kw">static_cast</span>&lt;<span class="kw">int</span>&gt;(d);    <span class="cm">// 3 (truncates)</span>
+<span class="kw">long long</span> ll = <span class="kw">static_cast</span>&lt;<span class="kw">long long</span>&gt;(<span class="nm">42</span>);
+
+<span class="cm">// Prevent integer overflow before multiply</span>
+<span class="kw">long long</span> res = <span class="kw">static_cast</span>&lt;<span class="kw">long long</span>&gt;(a) <span class="op">*</span> b;
+
+<span class="cm">// Enum to int and back</span>
+<span class="kw">enum class</span> <span class="ty">Color</span> { Red, Green, Blue };
+<span class="kw">int</span> n = <span class="kw">static_cast</span>&lt;<span class="kw">int</span>&gt;(<span class="ty">Color</span>::Green);  <span class="cm">// 1</span>
+<span class="ty">Color</span> c = <span class="kw">static_cast</span>&lt;<span class="ty">Color</span>&gt;(<span class="nm">2</span>);          <span class="cm">// Blue</span>
+
+<span class="cm">// Pointer upcast (always safe)</span>
+<span class="ty">Derived</span><span class="op">*</span> d2 = <span class="kw">new</span> <span class="ty">Derived</span>();
+<span class="ty">Base</span><span class="op">*</span> b = <span class="kw">static_cast</span>&lt;<span class="ty">Base</span><span class="op">*</span>&gt;(d2);
+
+<span class="cm">// Pointer downcast (unsafe — use dynamic_cast!)</span>
+<span class="ty">Derived</span><span class="op">*</span> d3 = <span class="kw">static_cast</span>&lt;<span class="ty">Derived</span><span class="op">*</span>&gt;(b);  <span class="cm">// risky</span>
+
+<span class="cm">// void* to typed pointer</span>
+<span class="kw">void</span><span class="op">*</span> vp = <span class="op">&amp;</span>i;
+<span class="kw">int</span><span class="op">*</span> ip = <span class="kw">static_cast</span>&lt;<span class="kw">int</span><span class="op">*</span>&gt;(vp);
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-cast">dynamic_cast · const_cast · reinterpret_cast</span></div>
+      <pre>
+<span class="cm">// dynamic_cast — safe downcast with runtime check</span>
+<span class="cm">// Requires polymorphic base (virtual function)</span>
+<span class="ty">Base</span><span class="op">*</span> b = <span class="kw">new</span> <span class="ty">Derived</span>();
+<span class="ty">Derived</span><span class="op">*</span> d = <span class="kw">dynamic_cast</span>&lt;<span class="ty">Derived</span><span class="op">*</span>&gt;(b);
+<span class="kw">if</span> (d) { <span class="cm">/* cast succeeded */</span> }
+<span class="cm">// Returns nullptr on failure (pointer)</span>
+<span class="cm">// Throws std::bad_cast on failure (reference)</span>
+<span class="ty">Derived</span><span class="op">&amp;</span> dr = <span class="kw">dynamic_cast</span>&lt;<span class="ty">Derived</span><span class="op">&amp;</span>&gt;(<span class="op">*</span>b);
+
+<span class="cm">// const_cast — add or remove const</span>
+<span class="kw">const</span> <span class="kw">int</span><span class="op">*</span> cp = <span class="op">&amp;</span>i;
+<span class="kw">int</span><span class="op">*</span> mp = <span class="kw">const_cast</span>&lt;<span class="kw">int</span><span class="op">*</span>&gt;(cp);   <span class="cm">// remove const</span>
+<span class="cm">// Only valid if underlying object is non-const!</span>
+
+<span class="kw">void</span> <span class="fn">print</span>(<span class="kw">char</span><span class="op">*</span> s);
+<span class="kw">const</span> <span class="kw">char</span><span class="op">*</span> cs = <span class="st">"hello"</span>;
+<span class="fn">print</span>(<span class="kw">const_cast</span>&lt;<span class="kw">char</span><span class="op">*</span>&gt;(cs));    <span class="cm">// legacy API</span>
+
+<span class="cm">// reinterpret_cast — raw bit reinterpretation</span>
+<span class="cm">// Dangerous! Use only when you know exactly what you're doing.</span>
+<span class="kw">int</span> x = <span class="nm">65</span>;
+<span class="kw">char</span><span class="op">*</span> cp2 = <span class="kw">reinterpret_cast</span>&lt;<span class="kw">char</span><span class="op">*</span>&gt;(<span class="op">&amp;</span>x);
+<span class="cm">// Use case: serialization, hardware registers</span>
+
+<span class="cm">// Type punning (C++20 use std::bit_cast)</span>
+<span class="kw">float</span> f = <span class="nm">1.0f</span>;
+<span class="kw">uint32_t</span> bits = <span class="fn">std::bit_cast</span>&lt;<span class="kw">uint32_t</span>&gt;(f); <span class="cm">// safe</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-cast">NUMERIC CONVERSIONS</span></div>
+      <pre>
+<span class="cm">// ── int / long long ↔ string ─────────────</span>
+<span class="kw">int</span> n = <span class="fn">stoi</span>(<span class="st">"42"</span>);               <span class="cm">// string → int</span>
+<span class="kw">int</span> n2 = <span class="fn">stoi</span>(<span class="st">"  -7 abc"</span>);        <span class="cm">// ignores leading spaces</span>
+<span class="kw">long</span> l = <span class="fn">stol</span>(<span class="st">"123456"</span>);
+<span class="kw">long long</span> ll = <span class="fn">stoll</span>(<span class="st">"9999999999"</span>);
+<span class="kw">unsigned long</span> ul = <span class="fn">stoul</span>(<span class="st">"42"</span>);
+<span class="kw">float</span> f = <span class="fn">stof</span>(<span class="st">"3.14"</span>);
+<span class="kw">double</span> d = <span class="fn">stod</span>(<span class="st">"3.14159"</span>);
+<span class="kw">long double</span> ld = <span class="fn">stold</span>(<span class="st">"1.23"</span>);
+
+<span class="cm">// With base (hex, binary, octal)</span>
+<span class="kw">int</span> hex = <span class="fn">stoi</span>(<span class="st">"ff"</span>, <span class="kw">nullptr</span>, <span class="nm">16</span>); <span class="cm">// 255</span>
+<span class="kw">int</span> bin = <span class="fn">stoi</span>(<span class="st">"1010"</span>, <span class="kw">nullptr</span>, <span class="nm">2</span>);<span class="cm">// 10</span>
+<span class="kw">int</span> oct = <span class="fn">stoi</span>(<span class="st">"17"</span>, <span class="kw">nullptr</span>, <span class="nm">8</span>);  <span class="cm">// 15</span>
+
+<span class="cm">// Position of first unconverted char</span>
+<span class="fn">size_t</span> pos;
+<span class="kw">int</span> v = <span class="fn">stoi</span>(<span class="st">"42abc"</span>, <span class="op">&amp;</span>pos);      <span class="cm">// v=42, pos=2</span>
+
+<span class="cm">// int / double → string</span>
+<span class="ty">std::string</span> s1 = <span class="fn">std::to_string</span>(<span class="nm">42</span>);      <span class="cm">// "42"</span>
+<span class="ty">std::string</span> s2 = <span class="fn">std::to_string</span>(<span class="nm">3.14</span>);   <span class="cm">// "3.140000"</span>
+<span class="ty">std::string</span> s3 = <span class="fn">std::to_string</span>(<span class="op">-</span><span class="nm">99LL</span>);  <span class="cm">// "-99"</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-cast">CHAR / ASCII CONVERSIONS</span></div>
+      <pre>
+<span class="cm">// char ↔ int</span>
+<span class="kw">char</span> c = <span class="st">'A'</span>;
+<span class="kw">int</span> ascii = (<span class="kw">int</span>)c;           <span class="cm">// 65</span>
+<span class="kw">int</span> ascii2 = c;               <span class="cm">// implicit, same</span>
+<span class="kw">char</span> back = (<span class="kw">char</span>)<span class="nm">65</span>;         <span class="cm">// 'A'</span>
+
+<span class="cm">// digit char ↔ int value</span>
+<span class="kw">char</span> d = <span class="st">'7'</span>;
+<span class="kw">int</span> val = d <span class="op">-</span> <span class="st">'0'</span>;            <span class="cm">// 7</span>
+<span class="kw">char</span> back2 = val <span class="op">+</span> <span class="st">'0'</span>;       <span class="cm">// '7'</span>
+
+<span class="cm">// letter ↔ 0-based index</span>
+<span class="kw">int</span> idx = c <span class="op">-</span> <span class="st">'a'</span>;            <span class="cm">// 'a'→0, 'b'→1 ...</span>
+<span class="kw">int</span> idxU = c <span class="op">-</span> <span class="st">'A'</span>;           <span class="cm">// 'A'→0, 'B'→1 ...</span>
+
+<span class="cm">// Case conversion</span>
+<span class="kw">char</span> lo = <span class="fn">tolower</span>(c);         <span class="cm">// 'A' → 'a'</span>
+<span class="kw">char</span> up = <span class="fn">toupper</span>(c);         <span class="cm">// 'a' → 'A'</span>
+<span class="cm">// Bitwise trick (ASCII only):</span>
+<span class="kw">char</span> lower = c <span class="op">|</span> <span class="nm">32</span>;          <span class="cm">// any letter → lowercase</span>
+<span class="kw">char</span> upper = c <span class="op">&amp;</span> <span class="op">~</span><span class="nm">32</span>;         <span class="cm">// any letter → uppercase</span>
+
+<span class="cm">// Character classification</span>
+<span class="fn">isalpha</span>(c)   <span class="cm">// letter a-z A-Z</span>
+<span class="fn">isdigit</span>(c)   <span class="cm">// digit 0-9</span>
+<span class="fn">isalnum</span>(c)   <span class="cm">// letter or digit</span>
+<span class="fn">isspace</span>(c)   <span class="cm">// space, tab, newline</span>
+<span class="fn">ispunct</span>(c)   <span class="cm">// punctuation</span>
+<span class="fn">isupper</span>(c) <span class="op">/</span> <span class="fn">islower</span>(c)
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-cast">ADVANCED / SAFE CONVERSION</span></div>
+      <pre>
+<span class="cm">// std::from_chars (C++17) — fastest, no locale</span>
+<span class="kw">int</span> result;
+<span class="kw">const</span> <span class="kw">char</span><span class="op">*</span> str = <span class="st">"12345"</span>;
+<span class="kw">auto</span> [ptr, ec] = <span class="fn">std::from_chars</span>(
+    str, str+<span class="nm">5</span>, result);
+<span class="kw">if</span> (ec <span class="op">==</span> <span class="ty">std::errc</span>{}) { <span class="cm">/* success */</span> }
+
+<span class="cm">// std::to_chars (C++17) — fastest int→str</span>
+<span class="kw">char</span> buf[<span class="nm">20</span>];
+<span class="kw">auto</span> [end, ec2] = <span class="fn">std::to_chars</span>(
+    buf, buf+<span class="nm">20</span>, <span class="nm">12345</span>);
+<span class="op">*</span>end = <span class="st">'\0'</span>;             <span class="cm">// null terminate</span>
+
+<span class="cm">// Hex string → int and back</span>
+<span class="ty">std::string</span> hex = <span class="st">"ff"</span>;
+<span class="kw">int</span> val = <span class="fn">stoi</span>(hex, <span class="kw">nullptr</span>, <span class="nm">16</span>);     <span class="cm">// 255</span>
+<span class="fn">std::ostringstream</span> oss;
+oss <span class="op">&lt;&lt;</span> <span class="fn">std::hex</span> <span class="op">&lt;&lt;</span> val;
+<span class="ty">std::string</span> back = oss.<span class="fn">str</span>();         <span class="cm">// "ff"</span>
+
+<span class="cm">// Safe numeric limits</span>
+<span class="fn">std::numeric_limits</span>&lt;<span class="kw">int</span>&gt;::<span class="fn">max</span>()    <span class="cm">// 2147483647</span>
+<span class="fn">std::numeric_limits</span>&lt;<span class="kw">int</span>&gt;::<span class="fn">min</span>()    <span class="cm">// -2147483648</span>
+<span class="fn">std::numeric_limits</span>&lt;<span class="kw">double</span>&gt;::<span class="fn">infinity</span>()
+<span class="fn">std::numeric_limits</span>&lt;<span class="kw">double</span>&gt;::<span class="fn">epsilon</span>()
+      </pre>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ LAMBDA FUNCTIONS ════════ -->
+<div class="section" id="lambda">
+  <div class="section-header">
+    <h2>Lambda Functions</h2>
+    <span style="font-size:11px;color:var(--muted);">C++11+ · [capture](params) → return { body }</span>
+  </div>
+  <div class="ops-grid">
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-lam">CAPTURE MODES</span></div>
+      <pre>
+<span class="kw">int</span> x = <span class="nm">10</span>, y = <span class="nm">20</span>;
+<span class="ty">std::vector</span>&lt;<span class="kw">int</span>&gt; v = {<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>};
+
+<span class="cm">// [] — capture nothing</span>
+<span class="kw">auto</span> f1 = []{ <span class="kw">return</span> <span class="nm">42</span>; };
+
+<span class="cm">// [=] — capture all by value (copy)</span>
+<span class="kw">auto</span> f2 = [=]{ <span class="kw">return</span> x + y; };   <span class="cm">// x,y copied</span>
+
+<span class="cm">// [&amp;] — capture all by reference</span>
+<span class="kw">auto</span> f3 = [<span class="op">&amp;</span>]{ x++; y++; };       <span class="cm">// modifies originals</span>
+
+<span class="cm">// Selective capture</span>
+<span class="kw">auto</span> f4 = [x]{ <span class="kw">return</span> x; };       <span class="cm">// only x by value</span>
+<span class="kw">auto</span> f5 = [<span class="op">&amp;</span>x]{ x++; };           <span class="cm">// only x by reference</span>
+<span class="kw">auto</span> f6 = [x, <span class="op">&amp;</span>y]{ y += x; };    <span class="cm">// x by val, y by ref</span>
+<span class="kw">auto</span> f7 = [<span class="op">=</span>, <span class="op">&amp;</span>v]{ v.<span class="fn">push_back</span>(x); }; <span class="cm">// default val, v by ref</span>
+<span class="kw">auto</span> f8 = [<span class="op">&amp;</span>, x]{ y += x; };     <span class="cm">// default ref, x by val</span>
+
+<span class="cm">// Capture with init (C++14)</span>
+<span class="kw">auto</span> f9 = [z = x + y]{ <span class="kw">return</span> z; };       <span class="cm">// new var z</span>
+<span class="kw">auto</span> f10 = [p = <span class="fn">std::move</span>(v)]() mutable { <span class="cm">// move into lambda</span>
+    p.<span class="fn">push_back</span>(<span class="nm">9</span>);
+};
+
+<span class="cm">// this capture (in class method)</span>
+<span class="kw">auto</span> f11 = [<span class="kw">this</span>]{ <span class="kw">return</span> <span class="kw">this</span><span class="op">-&gt;</span>val; };
+<span class="kw">auto</span> f12 = [<span class="op">*</span><span class="kw">this</span>]{ <span class="kw">return</span> val; };  <span class="cm">// C++17, copies this</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-lam">PARAMETERS &amp; RETURN TYPES</span></div>
+      <pre>
+<span class="cm">// No params</span>
+<span class="kw">auto</span> f1 = []{ <span class="kw">return</span> <span class="nm">42</span>; };
+<span class="kw">auto</span> f2 = []() { <span class="kw">return</span> <span class="nm">42</span>; };   <span class="cm">// same</span>
+
+<span class="cm">// With params</span>
+<span class="kw">auto</span> add = [](<span class="kw">int</span> a, <span class="kw">int</span> b) { <span class="kw">return</span> a + b; };
+<span class="nm">add</span>(<span class="nm">3</span>, <span class="nm">4</span>);                        <span class="cm">// 7</span>
+
+<span class="cm">// Explicit return type</span>
+<span class="kw">auto</span> div = [](<span class="kw">int</span> a, <span class="kw">int</span> b) <span class="op">-&gt;</span> <span class="kw">double</span> {
+    <span class="kw">return</span> (<span class="kw">double</span>)a / b;
+};
+
+<span class="cm">// Generic lambda (C++14) — auto parameters</span>
+<span class="kw">auto</span> mymax = [](<span class="kw">auto</span> a, <span class="kw">auto</span> b) { <span class="kw">return</span> a > b ? a : b; };
+<span class="nm">mymax</span>(<span class="nm">3</span>, <span class="nm">4</span>);           <span class="cm">// works for int, double, etc.</span>
+<span class="nm">mymax</span>(<span class="st">"abc"</span>, <span class="st">"xyz"</span>);
+
+<span class="cm">// Variadic generic lambda (C++14)</span>
+<span class="kw">auto</span> print = [](<span class="kw">auto</span><span class="op">&amp;&amp;</span>... args) {
+    ((<span class="fn">cout</span> <span class="op">&lt;&lt;</span> args <span class="op">&lt;&lt;</span> <span class="st">' '</span>), ...);
+};
+
+<span class="cm">// mutable — allows modifying captured-by-value</span>
+<span class="kw">int</span> cnt = <span class="nm">0</span>;
+<span class="kw">auto</span> counter = [cnt]() <span class="kw">mutable</span> { <span class="kw">return</span> ++cnt; };
+<span class="cm">// original cnt is unchanged; lambda has its own copy</span>
+
+<span class="cm">// noexcept lambda</span>
+<span class="kw">auto</span> safe = [](<span class="kw">int</span> x) <span class="kw">noexcept</span> { <span class="kw">return</span> x <span class="op">*</span> <span class="nm">2</span>; };
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-lam">STORING &amp; PASSING LAMBDAS</span></div>
+      <pre>
+<span class="cm">// Store in auto (simple)</span>
+<span class="kw">auto</span> f = [](<span class="kw">int</span> x) { <span class="kw">return</span> x <span class="op">*</span> <span class="nm">2</span>; };
+
+<span class="cm">// Store in std::function (type-erased, slower)</span>
+<span class="fn">std::function</span>&lt;<span class="kw">int</span>(<span class="kw">int</span>)&gt; g = [](<span class="kw">int</span> x){ <span class="kw">return</span> x*<span class="nm">2</span>; };
+<span class="fn">std::function</span>&lt;<span class="kw">void</span>()&gt; h = [&amp;]{ x++; };
+
+<span class="cm">// Pass to algorithms</span>
+<span class="fn">sort</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), [](<span class="kw">int</span> a, <span class="kw">int</span> b){ <span class="kw">return</span> a>b; });
+<span class="fn">find_if</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), [](<span class="kw">int</span> x){ <span class="kw">return</span> x><span class="nm">3</span>; });
+<span class="fn">transform</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), v.<span class="fn">begin</span>(), [](<span class="kw">int</span> x){ <span class="kw">return</span> x*<span class="nm">2</span>; });
+<span class="fn">count_if</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), [](<span class="kw">int</span> x){ <span class="kw">return</span> x<span class="op">%</span><span class="nm">2</span><span class="op">==</span><span class="nm">0</span>; });
+
+<span class="cm">// Accept as template parameter (fastest)</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> F&gt;
+<span class="kw">void</span> <span class="fn">apply</span>(<span class="ty">std::vector</span>&lt;<span class="kw">int</span>&gt;<span class="op">&amp;</span> v, F fn) {
+    <span class="kw">for</span>(<span class="kw">auto</span><span class="op">&amp;</span> x : v) x = <span class="fn">fn</span>(x);
+}
+<span class="fn">apply</span>(v, [](<span class="kw">int</span> x){ <span class="kw">return</span> x<span class="op">*</span><span class="nm">3</span>; });
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-lam">RECURSIVE LAMBDAS &amp; IIFE</span></div>
+      <pre>
+<span class="cm">// IIFE — Immediately Invoked Function Expression</span>
+<span class="kw">int</span> result = [](<span class="kw">int</span> n){ <span class="kw">return</span> n<span class="op">*</span>n; }(<span class="nm">5</span>);  <span class="cm">// 25</span>
+
+<span class="cm">// IIFE for complex initialization</span>
+<span class="kw">const</span> <span class="kw">auto</span> data = []() {
+    <span class="ty">std::vector</span>&lt;<span class="kw">int</span>&gt; v;
+    <span class="kw">for</span>(<span class="kw">int</span> i=<span class="nm">0</span>;i&lt;<span class="nm">10</span>;i++) v.<span class="fn">push_back</span>(i<span class="op">*</span>i);
+    <span class="kw">return</span> v;
+}();
+
+<span class="cm">// Recursive lambda — use std::function</span>
+<span class="fn">std::function</span>&lt;<span class="kw">int</span>(<span class="kw">int</span>)&gt; fib = [<span class="op">&amp;</span>fib](<span class="kw">int</span> n) {
+    <span class="kw">return</span> n &lt;= <span class="nm">1</span> ? n : <span class="fn">fib</span>(n-<span class="nm">1</span>) + <span class="fn">fib</span>(n-<span class="nm">2</span>);
+};
+
+<span class="cm">// Recursive lambda — C++23 deducing this</span>
+<span class="kw">auto</span> fib2 = [](<span class="kw">this</span> <span class="kw">auto</span> self, <span class="kw">int</span> n) {
+    <span class="kw">return</span> n &lt;= <span class="nm">1</span> ? n : <span class="fn">self</span>(n-<span class="nm">1</span>) + <span class="fn">self</span>(n-<span class="nm">2</span>);
+};
+
+<span class="cm">// DFS as recursive lambda (LeetCode pattern)</span>
+<span class="ty">vector</span>&lt;<span class="kw">int</span>&gt; res;
+<span class="fn">std::function</span>&lt;<span class="kw">void</span>(<span class="kw">int</span>, <span class="kw">int</span>)&gt; dfs;
+dfs = [<span class="op">&amp;</span>](<span class="kw">int</span> node, <span class="kw">int</span> parent) {
+    res.<span class="fn">push_back</span>(node);
+    <span class="kw">for</span>(<span class="kw">int</span> nb : adj[node])
+        <span class="kw">if</span>(nb <span class="op">!=</span> parent) <span class="fn">dfs</span>(nb, node);
+};
+<span class="fn">dfs</span>(<span class="nm">0</span>, <span class="op">-</span><span class="nm">1</span>);
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-lam">LAMBDAS AS COMPARATORS</span></div>
+      <pre>
+<span class="cm">// Custom sort — 2D point by distance</span>
+<span class="fn">sort</span>(pts.<span class="fn">begin</span>(), pts.<span class="fn">end</span>(), [](<span class="kw">auto</span><span class="op">&amp;</span> a, <span class="kw">auto</span><span class="op">&amp;</span> b){
+    <span class="kw">return</span> a[<span class="nm">0</span>]<span class="op">*</span>a[<span class="nm">0</span>]+a[<span class="nm">1</span>]<span class="op">*</span>a[<span class="nm">1</span>] &lt; b[<span class="nm">0</span>]<span class="op">*</span>b[<span class="nm">0</span>]+b[<span class="nm">1</span>]<span class="op">*</span>b[<span class="nm">1</span>];
+});
+
+<span class="cm">// Custom priority_queue comparator</span>
+<span class="kw">auto</span> cmp = [](<span class="kw">auto</span><span class="op">&amp;</span> a, <span class="kw">auto</span><span class="op">&amp;</span> b){ <span class="kw">return</span> a.freq &lt; b.freq; };
+<span class="fn">priority_queue</span>&lt;<span class="ty">Item</span>, <span class="ty">vector</span>&lt;<span class="ty">Item</span>&gt;, <span class="kw">decltype</span>(cmp)&gt; pq(cmp);
+
+<span class="cm">// Custom map comparator</span>
+<span class="kw">auto</span> cmp2 = [](<span class="kw">int</span> a, <span class="kw">int</span> b){ <span class="kw">return</span> <span class="fn">abs</span>(a) &lt; <span class="fn">abs</span>(b); };
+<span class="fn">map</span>&lt;<span class="kw">int</span>, <span class="kw">int</span>, <span class="kw">decltype</span>(cmp2)&gt; m(cmp2);
+
+<span class="cm">// Sort strings by length then lexicographic</span>
+<span class="fn">sort</span>(words.<span class="fn">begin</span>(), words.<span class="fn">end</span>(), [](<span class="kw">auto</span><span class="op">&amp;</span> a, <span class="kw">auto</span><span class="op">&amp;</span> b){
+    <span class="kw">return</span> a.<span class="fn">size</span>() <span class="op">!=</span> b.<span class="fn">size</span>() ? a.<span class="fn">size</span>() &lt; b.<span class="fn">size</span>() : a &lt; b;
+});
+      </pre>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ FILE I/O ════════════════ -->
+<div class="section" id="fileio">
+  <div class="section-header">
+    <h2>File I/O</h2>
+    <span style="font-size:11px;color:var(--muted);">#include &lt;fstream&gt; · ifstream · ofstream · fstream</span>
+  </div>
+  <div class="ops-grid">
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-file">READING FILES</span></div>
+      <pre>
+<span class="fn">std::ifstream</span> fin(<span class="st">"input.txt"</span>);
+<span class="kw">if</span> (!fin) { <span class="cm">/* file not found */</span> }
+
+<span class="cm">// Read word by word</span>
+<span class="ty">std::string</span> word;
+<span class="kw">while</span> (fin <span class="op">&gt;&gt;</span> word) {
+    cout <span class="op">&lt;&lt;</span> word <span class="op">&lt;&lt;</span> <span class="st">'\n'</span>;
+}
+
+<span class="cm">// Read line by line</span>
+<span class="ty">std::string</span> line;
+<span class="kw">while</span> (<span class="fn">std::getline</span>(fin, line)) {
+    cout <span class="op">&lt;&lt;</span> line <span class="op">&lt;&lt;</span> <span class="st">'\n'</span>;
+}
+
+<span class="cm">// Read ints</span>
+<span class="kw">int</span> x;
+<span class="kw">while</span> (fin <span class="op">&gt;&gt;</span> x) { cout <span class="op">&lt;&lt;</span> x; }
+
+<span class="cm">// Read entire file into string</span>
+<span class="fn">std::ifstream</span> f(<span class="st">"data.txt"</span>);
+<span class="ty">std::string</span> content(
+    (<span class="fn">std::istreambuf_iterator</span>&lt;<span class="kw">char</span>&gt;(f)),
+    <span class="fn">std::istreambuf_iterator</span>&lt;<span class="kw">char</span>&gt;());
+
+<span class="cm">// Open modes</span>
+<span class="fn">std::ifstream</span> f2(<span class="st">"f.txt"</span>, <span class="fn">std::ios::binary</span>);
+<span class="fn">std::ifstream</span> f3(<span class="st">"f.txt"</span>, <span class="fn">std::ios::in</span> <span class="op">|</span> <span class="fn">std::ios::ate</span>);
+<span class="kw">auto</span> size = f3.<span class="fn">tellg</span>();   <span class="cm">// file size</span>
+f3.<span class="fn">seekg</span>(<span class="nm">0</span>);              <span class="cm">// rewind to start</span>
+
+fin.<span class="fn">close</span>();              <span class="cm">// auto-closed at scope end</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-file">WRITING FILES</span></div>
+      <pre>
+<span class="cm">// Write / overwrite</span>
+<span class="fn">std::ofstream</span> fout(<span class="st">"output.txt"</span>);
+fout <span class="op">&lt;&lt;</span> <span class="st">"Hello, World!\n"</span>;
+fout <span class="op">&lt;&lt;</span> <span class="nm">42</span> <span class="op">&lt;&lt;</span> <span class="st">' '</span> <span class="op">&lt;&lt;</span> <span class="nm">3.14</span> <span class="op">&lt;&lt;</span> <span class="st">'\n'</span>;
+
+<span class="cm">// Append mode</span>
+<span class="fn">std::ofstream</span> fapp(<span class="st">"log.txt"</span>, <span class="fn">std::ios::app</span>);
+fapp <span class="op">&lt;&lt;</span> <span class="st">"new line\n"</span>;
+
+<span class="cm">// Read + Write</span>
+<span class="fn">std::fstream</span> rw(<span class="st">"data.txt"</span>,
+    <span class="fn">std::ios::in</span> <span class="op">|</span> <span class="fn">std::ios::out</span>);
+
+<span class="cm">// Formatting output</span>
+<span class="fn">std::ofstream</span> f(<span class="st">"out.txt"</span>);
+f <span class="op">&lt;&lt;</span> <span class="fn">std::fixed</span> <span class="op">&lt;&lt;</span> <span class="fn">std::setprecision</span>(<span class="nm">2</span>) <span class="op">&lt;&lt;</span> <span class="nm">3.14159</span>; <span class="cm">// 3.14</span>
+f <span class="op">&lt;&lt;</span> <span class="fn">std::setw</span>(<span class="nm">10</span>) <span class="op">&lt;&lt;</span> <span class="fn">std::right</span> <span class="op">&lt;&lt;</span> <span class="nm">42</span>;  <span class="cm">// right-pad</span>
+f <span class="op">&lt;&lt;</span> <span class="fn">std::hex</span> <span class="op">&lt;&lt;</span> <span class="nm">255</span>;                    <span class="cm">// "ff"</span>
+f <span class="op">&lt;&lt;</span> <span class="fn">std::boolalpha</span> <span class="op">&lt;&lt;</span> <span class="kw">true</span>;             <span class="cm">// "true"</span>
+f.<span class="fn">flush</span>();                               <span class="cm">// force write buffer</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-file">STRING STREAMS</span></div>
+      <pre>
+<span class="cm">// ostringstream — build strings efficiently</span>
+<span class="fn">std::ostringstream</span> oss;
+oss <span class="op">&lt;&lt;</span> <span class="st">"x="</span> <span class="op">&lt;&lt;</span> <span class="nm">42</span> <span class="op">&lt;&lt;</span> <span class="st">", y="</span> <span class="op">&lt;&lt;</span> <span class="nm">3.14</span>;
+<span class="ty">std::string</span> s = oss.<span class="fn">str</span>();   <span class="cm">// "x=42, y=3.14"</span>
+oss.<span class="fn">str</span>(<span class="st">""</span>);                 <span class="cm">// clear buffer</span>
+oss.<span class="fn">clear</span>();                 <span class="cm">// clear error flags</span>
+
+<span class="cm">// istringstream — parse from string</span>
+<span class="ty">std::string</span> data = <span class="st">"10 20 30"</span>;
+<span class="fn">std::istringstream</span> iss(data);
+<span class="kw">int</span> a, b, c;
+iss <span class="op">&gt;&gt;</span> a <span class="op">&gt;&gt;</span> b <span class="op">&gt;&gt;</span> c;          <span class="cm">// 10, 20, 30</span>
+
+<span class="cm">// Parse CSV line</span>
+<span class="ty">std::string</span> line = <span class="st">"Alice,25,NYC"</span>;
+<span class="fn">std::istringstream</span> ss(line);
+<span class="ty">std::string</span> token;
+<span class="kw">while</span> (<span class="fn">std::getline</span>(ss, token, <span class="st">','</span>)) {
+    cout <span class="op">&lt;&lt;</span> token <span class="op">&lt;&lt;</span> <span class="st">'\n'</span>;
+}
+
+<span class="cm">// stringstream — read + write</span>
+<span class="fn">std::stringstream</span> ss2(<span class="st">"100"</span>);
+<span class="kw">int</span> n; ss2 <span class="op">&gt;&gt;</span> n;
+ss2 <span class="op">&lt;&lt;</span> n <span class="op">*</span> <span class="nm">2</span>;
+      </pre>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ STRING PARSING ══════════ -->
+<div class="section" id="strparse">
+  <div class="section-header">
+    <h2>String Parsing</h2>
+    <span style="font-size:11px;color:var(--muted);">Split · Tokenize · Regex · sscanf · Manual parsing</span>
+  </div>
+  <div class="ops-grid">
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-str">SPLIT / TOKENIZE</span></div>
+      <pre>
+<span class="cm">// Method 1: istringstream (split by whitespace)</span>
+<span class="ty">std::string</span> s = <span class="st">"hello world foo"</span>;
+<span class="fn">std::istringstream</span> iss(s);
+<span class="ty">std::vector</span>&lt;<span class="ty">std::string</span>&gt; tokens;
+<span class="ty">std::string</span> tok;
+<span class="kw">while</span> (iss <span class="op">&gt;&gt;</span> tok) tokens.<span class="fn">push_back</span>(tok);
+
+<span class="cm">// Method 2: getline with delimiter</span>
+<span class="ty">std::string</span> csv = <span class="st">"a,b,c,d"</span>;
+<span class="fn">std::istringstream</span> ss(csv);
+<span class="kw">while</span> (<span class="fn">std::getline</span>(ss, tok, <span class="st">','</span>)) tokens.<span class="fn">push_back</span>(tok);
+
+<span class="cm">// Method 3: find + substr loop</span>
+<span class="ty">std::string</span> str = <span class="st">"one::two::three"</span>;
+<span class="ty">std::string</span> delim = <span class="st">"::"</span>;
+<span class="fn">size_t</span> pos = <span class="nm">0</span>, found;
+<span class="kw">while</span> ((found = str.<span class="fn">find</span>(delim, pos)) <span class="op">!=</span> <span class="ty">std::string</span>::npos) {
+    tokens.<span class="fn">push_back</span>(str.<span class="fn">substr</span>(pos, found - pos));
+    pos = found + delim.<span class="fn">size</span>();
+}
+tokens.<span class="fn">push_back</span>(str.<span class="fn">substr</span>(pos));  <span class="cm">// last token</span>
+
+<span class="cm">// Method 4: strtok (C-style, modifies string!)</span>
+<span class="kw">char</span> buf[] = <span class="st">"a,b,c"</span>;
+<span class="kw">char</span><span class="op">*</span> p = <span class="fn">strtok</span>(buf, <span class="st">","</span>);
+<span class="kw">while</span> (p) { tokens.<span class="fn">push_back</span>(p); p = <span class="fn">strtok</span>(<span class="kw">nullptr</span>, <span class="st">","</span>); }
+
+<span class="cm">// C++20 ranges split (conceptual)</span>
+<span class="cm">// auto parts = str | views::split(',');</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-str">SEARCH &amp; REPLACE IN STRINGS</span></div>
+      <pre>
+<span class="ty">std::string</span> s = <span class="st">"hello world hello"</span>;
+
+<span class="cm">// Find all occurrences</span>
+<span class="fn">size_t</span> pos = <span class="nm">0</span>;
+<span class="kw">while</span> ((pos = s.<span class="fn">find</span>(<span class="st">"hello"</span>, pos)) <span class="op">!=</span> <span class="ty">std::string</span>::npos) {
+    cout <span class="op">&lt;&lt;</span> <span class="st">"found at "</span> <span class="op">&lt;&lt;</span> pos <span class="op">&lt;&lt;</span> <span class="st">'\n'</span>;
+    pos++;
+}
+
+<span class="cm">// Replace all occurrences</span>
+<span class="ty">std::string</span> <span class="fn">replaceAll</span>(<span class="ty">std::string</span> s,
+    <span class="kw">const</span> <span class="ty">std::string</span><span class="op">&amp;</span> from,
+    <span class="kw">const</span> <span class="ty">std::string</span><span class="op">&amp;</span> to) {
+    <span class="fn">size_t</span> pos = <span class="nm">0</span>;
+    <span class="kw">while</span> ((pos = s.<span class="fn">find</span>(from, pos)) <span class="op">!=</span> <span class="ty">std::string</span>::npos) {
+        s.<span class="fn">replace</span>(pos, from.<span class="fn">size</span>(), to);
+        pos += to.<span class="fn">size</span>();
+    }
+    <span class="kw">return</span> s;
+}
+
+<span class="cm">// Trim whitespace (left / right / both)</span>
+s.<span class="fn">erase</span>(<span class="nm">0</span>, s.<span class="fn">find_first_not_of</span>(<span class="st">" \t\n\r"</span>));  <span class="cm">// ltrim</span>
+s.<span class="fn">erase</span>(s.<span class="fn">find_last_not_of</span>(<span class="st">" \t\n\r"</span>) + <span class="nm">1</span>); <span class="cm">// rtrim</span>
+
+<span class="cm">// Check prefix / suffix</span>
+s.<span class="fn">starts_with</span>(<span class="st">"he"</span>)   <span class="cm">// C++20</span>
+s.<span class="fn">ends_with</span>(<span class="st">"lo"</span>)     <span class="cm">// C++20</span>
+s.<span class="fn">find</span>(<span class="st">"he"</span>) <span class="op">==</span> <span class="nm">0</span>     <span class="cm">// prefix check pre-C++20</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-str">sscanf / sprintf / printf PATTERNS</span></div>
+      <pre>
+<span class="cm">// sscanf — parse formatted string (C-style)</span>
+<span class="kw">int</span> h, m, s;
+<span class="fn">sscanf</span>(<span class="st">"12:34:56"</span>, <span class="st">"%d:%d:%d"</span>, <span class="op">&amp;</span>h, <span class="op">&amp;</span>m, <span class="op">&amp;</span>s);
+<span class="cm">// h=12, m=34, s=56</span>
+
+<span class="ty">std::string</span> name; <span class="kw">int</span> age;
+<span class="fn">sscanf</span>(<span class="st">"Alice 25"</span>, <span class="st">"%s %d"</span>, name.<span class="fn">data</span>(), <span class="op">&amp;</span>age);
+
+<span class="cm">// sprintf — format into char buffer</span>
+<span class="kw">char</span> buf[<span class="nm">100</span>];
+<span class="fn">sprintf</span>(buf, <span class="st">"(%d, %d)"</span>, <span class="nm">3</span>, <span class="nm">4</span>);   <span class="cm">// "(3, 4)"</span>
+<span class="fn">sprintf</span>(buf, <span class="st">"%.2f"</span>, <span class="nm">3.14159</span>);   <span class="cm">// "3.14"</span>
+
+<span class="cm">// snprintf — safe (won't overflow buffer)</span>
+<span class="fn">snprintf</span>(buf, <span class="kw">sizeof</span>(buf), <span class="st">"%d"</span>, n);
+
+<span class="cm">// Format specifiers cheat</span>
+<span class="cm">// %d  int       %ld  long       %lld  long long</span>
+<span class="cm">// %f  float     %lf  double     %Lf   long double</span>
+<span class="cm">// %s  string    %c   char       %x    hex</span>
+<span class="cm">// %05d  zero-padded width 5</span>
+<span class="cm">// %.3f  3 decimal places</span>
+<span class="cm">// %-10s left-aligned width 10</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-str">REGEX (C++11)</span></div>
+      <pre>
+<span class="cm">// #include &lt;regex&gt;</span>
+<span class="ty">std::string</span> s = <span class="st">"2024-01-15"</span>;
+<span class="fn">std::regex</span> pat(<span class="st">R"((\d{4})-(\d{2})-(\d{2}))"</span>);
+
+<span class="cm">// Check if matches</span>
+<span class="fn">std::regex_match</span>(s, pat)    <span class="cm">// entire string</span>
+<span class="fn">std::regex_search</span>(s, pat)   <span class="cm">// anywhere in string</span>
+
+<span class="cm">// Extract groups</span>
+<span class="fn">std::smatch</span> m;
+<span class="kw">if</span> (<span class="fn">std::regex_match</span>(s, m, pat)) {
+    cout <span class="op">&lt;&lt;</span> m[<span class="nm">0</span>] <span class="cm">// full match: "2024-01-15"</span>
+    cout <span class="op">&lt;&lt;</span> m[<span class="nm">1</span>] <span class="cm">// group 1: "2024"</span>
+    cout <span class="op">&lt;&lt;</span> m[<span class="nm">2</span>] <span class="cm">// group 2: "01"</span>
+    cout <span class="op">&lt;&lt;</span> m[<span class="nm">3</span>] <span class="cm">// group 3: "15"</span>
+}
+
+<span class="cm">// Replace</span>
+<span class="ty">std::string</span> res = <span class="fn">std::regex_replace</span>(
+    s, <span class="fn">std::regex</span>(<span class="st">R"(-)"</span>), <span class="st">"/"</span>);  <span class="cm">// "2024/01/15"</span>
+
+<span class="cm">// Find all matches (iterator)</span>
+<span class="ty">std::string</span> text = <span class="st">"cat bat rat"</span>;
+<span class="fn">std::regex</span> word(<span class="st">R"(\b\w+at\b)"</span>);
+<span class="kw">for</span>(<span class="kw">auto</span> it = <span class="fn">std::sregex_iterator</span>(
+    text.<span class="fn">begin</span>(), text.<span class="fn">end</span>(), word);
+    it <span class="op">!=</span> <span class="fn">std::sregex_iterator</span>(); ++it)
+    cout <span class="op">&lt;&lt;</span> (*it).<span class="fn">str</span>() <span class="op">&lt;&lt;</span> <span class="st">'\n'</span>;
+      </pre>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ TEMPLATES ══════════════ -->
+<div class="section" id="templates">
+  <div class="section-header">
+    <h2>Templates &amp; Generic Programming</h2>
+    <span style="font-size:11px;color:var(--muted);">Function templates · Class templates · Concepts (C++20) · SFINAE</span>
+  </div>
+  <div class="ops-grid">
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">FUNCTION TEMPLATES</span></div>
+      <pre>
+<span class="cm">// Basic function template</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T&gt;
+T <span class="fn">myMax</span>(T a, T b) { <span class="kw">return</span> a > b ? a : b; }
+
+<span class="nm">myMax</span>(<span class="nm">3</span>, <span class="nm">4</span>);         <span class="cm">// T deduced as int</span>
+<span class="nm">myMax</span>(<span class="nm">3.0</span>, <span class="nm">4.0</span>);     <span class="cm">// T deduced as double</span>
+<span class="nm">myMax</span>&lt;<span class="kw">int</span>&gt;(<span class="nm">3</span>, <span class="nm">4</span>);    <span class="cm">// explicit</span>
+
+<span class="cm">// Multiple type params</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T, <span class="kw">typename</span> U&gt;
+<span class="kw">auto</span> <span class="fn">add</span>(T a, U b) <span class="op">-&gt;</span> <span class="kw">decltype</span>(a+b) { <span class="kw">return</span> a+b; }
+
+<span class="cm">// Non-type template parameter</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T, <span class="kw">int</span> N&gt;
+T <span class="fn">arrMax</span>(T (&amp;arr)[N]) {
+    <span class="kw">return</span> <span class="op">*</span><span class="fn">std::max_element</span>(arr, arr+N);
+}
+
+<span class="cm">// Variadic template (C++11)</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span>... Args&gt;
+<span class="kw">void</span> <span class="fn">print</span>(Args<span class="op">&amp;&amp;</span>... args) {
+    ((<span class="fn">cout</span> <span class="op">&lt;&lt;</span> args <span class="op">&lt;&lt;</span> <span class="st">' '</span>), ...); <span class="cm">// fold expression</span>
+}
+<span class="fn">print</span>(<span class="nm">1</span>, <span class="st">"hi"</span>, <span class="nm">3.14</span>);
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">CLASS TEMPLATES</span></div>
+      <pre>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T&gt;
+<span class="kw">class</span> <span class="ty">Stack</span> {
+    <span class="fn">std::vector</span>&lt;T&gt; data;
+<span class="kw">public</span>:
+    <span class="kw">void</span> <span class="fn">push</span>(<span class="kw">const</span> T<span class="op">&amp;</span> v) { data.<span class="fn">push_back</span>(v); }
+    <span class="kw">void</span> <span class="fn">pop</span>() { data.<span class="fn">pop_back</span>(); }
+    T<span class="op">&amp;</span> <span class="fn">top</span>() { <span class="kw">return</span> data.<span class="fn">back</span>(); }
+    <span class="kw">bool</span> <span class="fn">empty</span>() { <span class="kw">return</span> data.<span class="fn">empty</span>(); }
+};
+<span class="ty">Stack</span>&lt;<span class="kw">int</span>&gt; s;
+<span class="ty">Stack</span>&lt;<span class="ty">std::string</span>&gt; ss;
+
+<span class="cm">// Class template with default param</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T, <span class="kw">typename</span> Alloc = <span class="fn">std::allocator</span>&lt;T&gt;&gt;
+<span class="kw">class</span> <span class="ty">MyVec</span> { <span class="cm">/* ... */</span> };
+
+<span class="cm">// Template specialization</span>
+<span class="kw">template</span>&lt;&gt;
+<span class="kw">class</span> <span class="ty">Stack</span>&lt;<span class="kw">bool</span>&gt; {
+    <span class="cm">// specialized for bool — store as bits</span>
+};
+
+<span class="cm">// if constexpr (C++17) — compile-time branching</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T&gt;
+<span class="kw">void</span> <span class="fn">process</span>(T val) {
+    <span class="kw">if constexpr</span> (<span class="fn">std::is_integral_v</span>&lt;T&gt;)
+        cout <span class="op">&lt;&lt;</span> <span class="st">"int: "</span> <span class="op">&lt;&lt;</span> val;
+    <span class="kw">else</span>
+        cout <span class="op">&lt;&lt;</span> <span class="st">"other: "</span> <span class="op">&lt;&lt;</span> val;
+}
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">TYPE TRAITS &amp; CONCEPTS</span></div>
+      <pre>
+<span class="cm">// #include &lt;type_traits&gt;</span>
+<span class="fn">std::is_integral</span>&lt;T&gt;::value    <span class="cm">// is int, long, etc.?</span>
+<span class="fn">std::is_floating_point</span>&lt;T&gt;::value
+<span class="fn">std::is_pointer</span>&lt;T&gt;::value
+<span class="fn">std::is_same</span>&lt;T, U&gt;::value     <span class="cm">// T == U?</span>
+<span class="fn">std::is_base_of</span>&lt;Base,T&gt;::value
+<span class="fn">std::is_convertible</span>&lt;T,U&gt;::value
+<span class="fn">std::remove_const</span>&lt;T&gt;::<span class="kw">type</span>   <span class="cm">// strip const</span>
+<span class="fn">std::remove_reference</span>&lt;T&gt;::<span class="kw">type</span>
+<span class="fn">std::decay</span>&lt;T&gt;::<span class="kw">type</span>           <span class="cm">// remove all qualifiers</span>
+
+<span class="cm">// _v and _t shortcuts (C++17)</span>
+<span class="fn">std::is_integral_v</span>&lt;T&gt;         <span class="cm">// same as ::value</span>
+<span class="fn">std::remove_const_t</span>&lt;T&gt;        <span class="cm">// same as ::type</span>
+
+<span class="cm">// Concepts (C++20)</span>
+<span class="kw">template</span>&lt;<span class="fn">std::integral</span> T&gt;
+T <span class="fn">add</span>(T a, T b) { <span class="kw">return</span> a + b; }
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T&gt;
+<span class="kw">requires</span> <span class="fn">std::integral</span>&lt;T&gt; <span class="op">||</span> <span class="fn">std::floating_point</span>&lt;T&gt;
+T <span class="fn">numeric_fn</span>(T x) { <span class="kw">return</span> x <span class="op">*</span> <span class="nm">2</span>; }
+      </pre>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ CONCURRENCY ════════════ -->
+<div class="section" id="concurrency">
+  <div class="section-header">
+    <h2>Concurrency Essentials</h2>
+    <span style="font-size:11px;color:var(--muted);">#include &lt;thread&gt; · &lt;mutex&gt; · &lt;atomic&gt; · &lt;future&gt;</span>
+  </div>
+  <div class="ops-grid">
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">THREADS &amp; MUTEX</span></div>
+      <pre>
+<span class="cm">// Basic thread</span>
+<span class="fn">std::thread</span> t([]{ cout <span class="op">&lt;&lt;</span> <span class="st">"hello"</span>; });
+t.<span class="fn">join</span>();    <span class="cm">// wait for thread to finish</span>
+t.<span class="fn">detach</span>(); <span class="cm">// run independently (fire & forget)</span>
+
+<span class="cm">// Thread with args</span>
+<span class="fn">std::thread</span> t2([](int n){ <span class="kw">return</span> n*n; }, <span class="nm">5</span>);
+t2.<span class="fn">join</span>();
+
+<span class="cm">// Mutex — protect shared data</span>
+<span class="fn">std::mutex</span> mtx;
+<span class="kw">int</span> shared = <span class="nm">0</span>;
+<span class="fn">std::thread</span> t3([&amp;]{
+    <span class="fn">std::lock_guard</span>&lt;<span class="fn">std::mutex</span>&gt; lock(mtx);
+    shared++;  <span class="cm">// protected</span>
+});
+
+<span class="cm">// unique_lock (more flexible)</span>
+<span class="fn">std::unique_lock</span>&lt;<span class="fn">std::mutex</span>&gt; ul(mtx);
+ul.<span class="fn">unlock</span>();
+ul.<span class="fn">lock</span>();
+
+<span class="cm">// Atomic — lock-free for simple types</span>
+<span class="fn">std::atomic</span>&lt;<span class="kw">int</span>&gt; counter(<span class="nm">0</span>);
+counter++;                     <span class="cm">// atomic increment</span>
+counter.<span class="fn">fetch_add</span>(<span class="nm">1</span>);         <span class="cm">// same</span>
+counter.<span class="fn">load</span>();               <span class="cm">// read atomically</span>
+counter.<span class="fn">store</span>(<span class="nm">0</span>);             <span class="cm">// write atomically</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">ASYNC / FUTURE / PROMISE</span></div>
+      <pre>
+<span class="cm">// std::async — run task asynchronously</span>
+<span class="kw">auto</span> fut = <span class="fn">std::async</span>(<span class="fn">std::launch::async</span>, [](){
+    <span class="kw">return</span> <span class="nm">42</span>;
+});
+<span class="kw">int</span> result = fut.<span class="fn">get</span>();        <span class="cm">// blocks until done</span>
+
+<span class="cm">// std::promise + std::future</span>
+<span class="fn">std::promise</span>&lt;<span class="kw">int</span>&gt; prom;
+<span class="kw">auto</span> future = prom.<span class="fn">get_future</span>();
+<span class="fn">std::thread</span> t([<span class="op">&amp;</span>prom]{
+    prom.<span class="fn">set_value</span>(<span class="nm">100</span>);        <span class="cm">// signal result</span>
+});
+cout <span class="op">&lt;&lt;</span> future.<span class="fn">get</span>();           <span class="cm">// 100</span>
+t.<span class="fn">join</span>();
+
+<span class="cm">// std::call_once — run once across threads</span>
+<span class="fn">std::once_flag</span> flag;
+<span class="fn">std::call_once</span>(flag, []{ <span class="cm">/* init once */</span> });
+
+<span class="cm">// condition_variable — producer-consumer</span>
+<span class="fn">std::mutex</span> m;
+<span class="fn">std::condition_variable</span> cv;
+<span class="kw">bool</span> ready = <span class="kw">false</span>;
+
+<span class="cm">// Producer:</span>
+{ <span class="fn">std::lock_guard</span>&lt;<span class="fn">std::mutex</span>&gt; lk(m);
+  ready = <span class="kw">true</span>; } cv.<span class="fn">notify_one</span>();
+
+<span class="cm">// Consumer:</span>
+<span class="fn">std::unique_lock</span>&lt;<span class="fn">std::mutex</span>&gt; lk(m);
+cv.<span class="fn">wait</span>(lk, [&amp;]{ <span class="kw">return</span> ready; });
+      </pre>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ LEETCODE PATTERNS ═══════ -->
+<div class="section" id="leetcode">
+  <div class="section-header">
+    <h2>LeetCode-Specific Patterns</h2>
+    <span style="font-size:11px;color:var(--muted);">Boilerplate · Common pitfalls · Tricks · Templates</span>
+  </div>
+  <div class="ops-grid">
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">SOLUTION BOILERPLATE</span></div>
+      <pre>
+<span class="cm">// Competition template (GCC only)</span>
+<span class="kw">#include</span> <span class="st">&lt;bits/stdc++.h&gt;</span>
+<span class="kw">using namespace</span> std;
+
+<span class="kw">#define</span> ll    <span class="kw">long long</span>
+<span class="kw">#define</span> ull   <span class="kw">unsigned long long</span>
+<span class="kw">#define</span> pii   pair&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt;
+<span class="kw">#define</span> pll   pair&lt;ll,ll&gt;
+<span class="kw">#define</span> vvi   vector&lt;vector&lt;<span class="kw">int</span>&gt;&gt;
+<span class="kw">#define</span> vi    vector&lt;<span class="kw">int</span>&gt;
+<span class="kw">#define</span> pb    push_back
+<span class="kw">#define</span> eb    emplace_back
+<span class="kw">#define</span> all(v)   (v).<span class="fn">begin</span>(),(v).<span class="fn">end</span>()
+<span class="kw">#define</span> sz(v)    (<span class="kw">int</span>)(v).<span class="fn">size</span>()
+<span class="kw">#define</span> F         first
+<span class="kw">#define</span> S         second
+
+<span class="kw">const</span> <span class="kw">int</span> INF = <span class="nm">1e9</span>;
+<span class="kw">const</span> ll  LINF = <span class="nm">2e18</span>;
+<span class="kw">const</span> <span class="kw">int</span> MOD = <span class="nm">1e9</span>+<span class="nm">7</span>;
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="fn">ios_base::sync_with_stdio</span>(<span class="kw">false</span>);
+    cin.<span class="fn">tie</span>(<span class="kw">NULL</span>);
+    <span class="cm">// solve</span>
+    <span class="kw">return</span> <span class="nm">0</span>;
+}
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">COMMON NODE DEFINITIONS</span></div>
+      <pre>
+<span class="cm">// Linked List Node</span>
+<span class="kw">struct</span> <span class="ty">ListNode</span> {
+    <span class="kw">int</span> val;
+    <span class="ty">ListNode</span><span class="op">*</span> next;
+    <span class="ty">ListNode</span>(<span class="kw">int</span> x) : val(x), next(<span class="kw">nullptr</span>) {}
+};
+
+<span class="cm">// Binary Tree Node</span>
+<span class="kw">struct</span> <span class="ty">TreeNode</span> {
+    <span class="kw">int</span> val;
+    <span class="ty">TreeNode</span><span class="op">*</span> left;
+    <span class="ty">TreeNode</span><span class="op">*</span> right;
+    <span class="ty">TreeNode</span>(<span class="kw">int</span> x)
+        : val(x), left(<span class="kw">nullptr</span>), right(<span class="kw">nullptr</span>) {}
+    <span class="ty">TreeNode</span>(<span class="kw">int</span> x, <span class="ty">TreeNode</span><span class="op">*</span> l, <span class="ty">TreeNode</span><span class="op">*</span> r)
+        : val(x), left(l), right(r) {}
+};
+
+<span class="cm">// Graph Node</span>
+<span class="kw">struct</span> <span class="ty">Node</span> {
+    <span class="kw">int</span> val;
+    <span class="ty">vector</span>&lt;<span class="ty">Node</span><span class="op">*</span>&gt; neighbors;
+    <span class="ty">Node</span>(<span class="kw">int</span> v) : val(v) {}
+};
+
+<span class="cm">// Trie Node</span>
+<span class="kw">struct</span> <span class="ty">TrieNode</span> {
+    <span class="ty">TrieNode</span><span class="op">*</span> children[<span class="nm">26</span>];
+    <span class="kw">bool</span> isEnd;
+    <span class="ty">TrieNode</span>() : isEnd(<span class="kw">false</span>) {
+        <span class="fn">fill</span>(children, children+<span class="nm">26</span>, <span class="kw">nullptr</span>);
+    }
+};
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">MODULAR ARITHMETIC</span></div>
+      <pre>
+<span class="kw">const</span> <span class="kw">long long</span> MOD = <span class="nm">1e9</span> + <span class="nm">7</span>;
+
+<span class="cm">// Always mod intermediate results</span>
+<span class="kw">long long</span> res = (a + b) <span class="op">%</span> MOD;
+<span class="kw">long long</span> res2 = (a <span class="op">%</span> MOD + b <span class="op">%</span> MOD) <span class="op">%</span> MOD;
+<span class="kw">long long</span> prod = (a <span class="op">%</span> MOD) <span class="op">*</span> (b <span class="op">%</span> MOD) <span class="op">%</span> MOD;
+
+<span class="cm">// Subtraction mod (prevent negative)</span>
+<span class="kw">long long</span> diff = ((a - b) <span class="op">%</span> MOD + MOD) <span class="op">%</span> MOD;
+
+<span class="cm">// Fast power (modular exponentiation)</span>
+ll <span class="fn">power</span>(ll base, ll exp, ll mod) {
+    ll result = <span class="nm">1</span>;
+    base <span class="op">%=</span> mod;
+    <span class="kw">while</span> (exp > <span class="nm">0</span>) {
+        <span class="kw">if</span> (exp <span class="op">&amp;</span> <span class="nm">1</span>) result = result * base <span class="op">%</span> mod;
+        base = base * base <span class="op">%</span> mod;
+        exp <span class="op">&gt;&gt;=</span> <span class="nm">1</span>;
+    }
+    <span class="kw">return</span> result;
+}
+
+<span class="cm">// Modular inverse (a^(MOD-2) % MOD, when MOD is prime)</span>
+ll <span class="fn">modinv</span>(ll a, ll mod) { <span class="kw">return</span> <span class="fn">power</span>(a, mod-<span class="nm">2</span>, mod); }
+<span class="cm">// Division under mod: (a/b) % MOD = a * modinv(b, MOD) % MOD</span>
+
+<span class="cm">// Factorial with mod precomputed</span>
+vector&lt;ll&gt; fact(<span class="nm">N</span>+<span class="nm">1</span>);
+fact[<span class="nm">0</span>] = <span class="nm">1</span>;
+<span class="kw">for</span>(<span class="kw">int</span> i=<span class="nm">1</span>;i&lt;=N;i++) fact[i] = fact[i-<span class="nm">1</span>] <span class="op">*</span> i <span class="op">%</span> MOD;
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">BIT MANIPULATION TRICKS</span></div>
+      <pre>
+<span class="cm">// Check / set / clear / toggle bit k</span>
+n <span class="op">&amp;</span> (<span class="nm">1</span> <span class="op">&lt;&lt;</span> k)      <span class="cm">// check bit k</span>
+n <span class="op">|</span> (<span class="nm">1</span> <span class="op">&lt;&lt;</span> k)      <span class="cm">// set bit k</span>
+n <span class="op">&amp;</span> <span class="op">~</span>(<span class="nm">1</span> <span class="op">&lt;&lt;</span> k)     <span class="cm">// clear bit k</span>
+n <span class="op">^</span> (<span class="nm">1</span> <span class="op">&lt;&lt;</span> k)      <span class="cm">// toggle bit k</span>
+
+<span class="cm">// Common idioms</span>
+n <span class="op">&amp;</span> (n-<span class="nm">1</span>)          <span class="cm">// clear lowest set bit</span>
+n <span class="op">&amp;</span> (-n)            <span class="cm">// isolate lowest set bit</span>
+n <span class="op">&amp;</span> <span class="nm">1</span>               <span class="cm">// check odd (LSB)</span>
+(n + <span class="nm">1</span>) <span class="op">&amp;</span> n <span class="op">==</span> <span class="nm">0</span>  <span class="cm">// is n == 2^k - 1?</span>
+(n <span class="op">&amp;</span> (n-<span class="nm">1</span>)) <span class="op">==</span> <span class="nm">0</span>  <span class="cm">// is n a power of 2?</span>
+n <span class="op">^</span> n <span class="op">==</span> <span class="nm">0</span>         <span class="cm">// XOR self = 0</span>
+a <span class="op">^</span> b <span class="op">^</span> b <span class="op">==</span> a     <span class="cm">// XOR is its own inverse</span>
+
+<span class="cm">// Built-ins (GCC)</span>
+<span class="fn">__builtin_popcount</span>(n)    <span class="cm">// count set bits (int)</span>
+<span class="fn">__builtin_popcountll</span>(n)  <span class="cm">// count set bits (long long)</span>
+<span class="fn">__builtin_clz</span>(n)         <span class="cm">// leading zeros</span>
+<span class="fn">__builtin_ctz</span>(n)         <span class="cm">// trailing zeros</span>
+<span class="fn">__builtin_parity</span>(n)      <span class="cm">// parity of set bits</span>
+
+<span class="cm">// Bitmask DP: iterate all subsets of mask</span>
+<span class="kw">for</span>(<span class="kw">int</span> sub = mask; sub > <span class="nm">0</span>; sub = (sub-<span class="nm">1</span>) <span class="op">&amp;</span> mask)
+    <span class="cm">/* process subset sub */</span>;
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">OVERFLOW &amp; LIMITS</span></div>
+      <pre>
+<span class="cm">// Type limits (from &lt;climits&gt; / &lt;limits&gt;)</span>
+INT_MAX         <span class="cm">// 2147483647    (~2.1 billion)</span>
+INT_MIN         <span class="cm">// -2147483648</span>
+LLONG_MAX       <span class="cm">// 9223372036854775807 (~9.2×10^18)</span>
+LLONG_MIN       <span class="cm">// -9223372036854775808</span>
+UINT_MAX        <span class="cm">// 4294967295</span>
+DBL_MAX         <span class="cm">// ~1.8×10^308</span>
+
+<span class="cm">// Safe large constants</span>
+<span class="kw">const</span> <span class="kw">int</span>  INF  = <span class="nm">0x3f3f3f3f</span>;  <span class="cm">// ~1e9, safe to add</span>
+<span class="kw">const</span> ll   LINF = <span class="nm">0x3f3f3f3f3f3f3f3fLL</span>;
+
+<span class="cm">// Overflow detection before it happens</span>
+<span class="kw">if</span> (a > INT_MAX - b)     <span class="cm">// a+b would overflow</span>
+<span class="kw">if</span> (a > INT_MAX / b)     <span class="cm">// a*b would overflow</span>
+
+<span class="cm">// Cast before multiply to avoid overflow</span>
+ll result = (<span class="kw">long long</span>)a <span class="op">*</span> b;  <span class="cm">// safe</span>
+ll result2 = <span class="nm">1LL</span> <span class="op">*</span> a <span class="op">*</span> b;      <span class="cm">// same, cleaner</span>
+
+<span class="cm">// NaN and infinity check</span>
+<span class="fn">std::isinf</span>(x)   <span class="cm">// is x infinity?</span>
+<span class="fn">std::isnan</span>(x)   <span class="cm">// is x NaN?</span>
+<span class="fn">std::isfinite</span>(x) <span class="cm">// is x finite?</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">USEFUL MATH FUNCTIONS</span></div>
+      <pre>
+<span class="cm">// &lt;cmath&gt; functions</span>
+<span class="fn">abs</span>(x)       <span class="cm">// absolute value (int/double)</span>
+<span class="fn">fabs</span>(x)      <span class="cm">// float absolute</span>
+<span class="fn">sqrt</span>(x)      <span class="cm">// square root</span>
+<span class="fn">cbrt</span>(x)      <span class="cm">// cube root</span>
+<span class="fn">pow</span>(x, n)    <span class="cm">// x^n (returns double)</span>
+<span class="fn">log</span>(x)       <span class="cm">// natural log</span>
+<span class="fn">log2</span>(x)      <span class="cm">// log base 2</span>
+<span class="fn">log10</span>(x)     <span class="cm">// log base 10</span>
+<span class="fn">ceil</span>(x)      <span class="cm">// ceiling</span>
+<span class="fn">floor</span>(x)     <span class="cm">// floor</span>
+<span class="fn">round</span>(x)     <span class="cm">// round to nearest</span>
+<span class="fn">trunc</span>(x)     <span class="cm">// truncate (toward 0)</span>
+<span class="fn">fmod</span>(x, y)   <span class="cm">// floating mod</span>
+<span class="fn">hypot</span>(x, y)  <span class="cm">// sqrt(x²+y²)</span>
+
+<span class="cm">// &lt;numeric&gt; (C++17)</span>
+<span class="fn">std::gcd</span>(a, b)     <span class="cm">// GCD</span>
+<span class="fn">std::lcm</span>(a, b)     <span class="cm">// LCM</span>
+<span class="fn">std::midpoint</span>(a,b) <span class="cm">// (a+b)/2 without overflow</span>
+
+<span class="cm">// Integer log2 (no float needed)</span>
+<span class="kw">int</span> <span class="fn">ilog2</span>(<span class="kw">int</span> n) { <span class="kw">return</span> <span class="nm">31</span> <span class="op">-</span> <span class="fn">__builtin_clz</span>(n); }
+
+<span class="cm">// Integer square root (exact)</span>
+<span class="kw">int</span> <span class="fn">isqrt</span>(<span class="kw">int</span> n) { <span class="kw">return</span> (<span class="kw">int</span>)<span class="fn">sqrt</span>((<span class="kw">double</span>)n); }
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">STRUCTURED BINDINGS &amp; MODERN SYNTAX</span></div>
+      <pre>
+<span class="cm">// Structured bindings (C++17)</span>
+<span class="kw">auto</span> [a, b] = <span class="fn">make_pair</span>(<span class="nm">1</span>, <span class="nm">2</span>);
+<span class="kw">auto</span> [x, y, z] = <span class="fn">make_tuple</span>(<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>);
+<span class="kw">auto</span> [key, val] = <span class="op">*</span>mp.<span class="fn">begin</span>();
+<span class="kw">auto</span> [it, ok] = s.<span class="fn">insert</span>(<span class="nm">5</span>);
+<span class="kw">for</span>(<span class="kw">auto</span><span class="op">&amp;</span> [k, v] : mp) cout <span class="op">&lt;&lt;</span> k <span class="op">&lt;&lt;</span> v;
+
+<span class="cm">// if-init statement (C++17)</span>
+<span class="kw">if</span>(<span class="kw">auto</span> it = mp.<span class="fn">find</span>(k); it <span class="op">!=</span> mp.<span class="fn">end</span>())
+    cout <span class="op">&lt;&lt;</span> it<span class="op">-&gt;</span>second;
+
+<span class="cm">// Inline variable (C++17)</span>
+<span class="kw">inline</span> <span class="kw">constexpr</span> <span class="kw">int</span> MAXN = <span class="nm">100005</span>;
+
+<span class="cm">// Fold expressions (C++17)</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span>... T&gt;
+<span class="kw">auto</span> <span class="fn">sum</span>(T... v) { <span class="kw">return</span> (v + ...); }
+<span class="fn">sum</span>(<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>,<span class="nm">4</span>);  <span class="cm">// 10</span>
+
+<span class="cm">// std::exchange</span>
+<span class="kw">int</span> old = <span class="fn">std::exchange</span>(x, <span class="nm">0</span>);  <span class="cm">// x=0, old=old x</span>
+
+<span class="cm">// String literals</span>
+<span class="kw">auto</span> s = <span class="st">R"(raw \n string)"</span>s;   <span class="cm">// raw + std::string</span>
+<span class="kw">auto</span> s2 = <span class="st">"hello"</span>s;            <span class="cm">// std::string literal</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">COMMON PITFALLS &amp; FIXES</span></div>
+      <pre>
+<span class="cm">// ❌ Integer overflow in conditions</span>
+<span class="kw">if</span> (a + b > INT_MAX) ...    <span class="cm">// already overflowed!</span>
+<span class="cm">// ✅ Cast first:</span>
+<span class="kw">if</span> ((<span class="kw">long long</span>)a + b > INT_MAX) ...
+
+<span class="cm">// ❌ Signed/unsigned comparison warning</span>
+<span class="kw">for</span>(<span class="kw">int</span> i=<span class="nm">0</span>; i &lt; v.<span class="fn">size</span>(); i++)  <span class="cm">// size() is unsigned!</span>
+<span class="cm">// ✅</span>
+<span class="kw">for</span>(<span class="kw">int</span> i=<span class="nm">0</span>; i &lt; (<span class="kw">int</span>)v.<span class="fn">size</span>(); i++)
+
+<span class="cm">// ❌ Iterator invalidation</span>
+<span class="kw">for</span>(<span class="kw">auto</span> it = v.<span class="fn">begin</span>(); it != v.<span class="fn">end</span>();) {
+    <span class="kw">if</span>(cond) v.<span class="fn">erase</span>(it);  <span class="cm">// it is now invalid!</span>
+}
+<span class="cm">// ✅ erase returns next valid iterator:</span>
+<span class="kw">if</span>(cond) it = v.<span class="fn">erase</span>(it); <span class="kw">else</span> ++it;
+
+<span class="cm">// ❌ Returning reference to local variable</span>
+<span class="kw">int</span><span class="op">&amp;</span> <span class="fn">bad</span>() { <span class="kw">int</span> x = <span class="nm">5</span>; <span class="kw">return</span> x; } <span class="cm">// dangling!</span>
+
+<span class="cm">// ❌ Using mp[key] for read (inserts default!)</span>
+<span class="kw">if</span> (mp[<span class="st">"key"</span>] > <span class="nm">0</span>) ...          <span class="cm">// inserts "key"→0</span>
+<span class="cm">// ✅</span>
+<span class="kw">if</span> (mp.<span class="fn">count</span>(<span class="st">"key"</span>) <span class="op">&amp;&amp;</span> mp[<span class="st">"key"</span>] > <span class="nm">0</span>) ...
+
+<span class="cm">// ❌ Sort then compare with != (floating point)</span>
+<span class="kw">if</span> (x <span class="op">==</span> y) ...   <span class="cm">// unreliable for double</span>
+<span class="cm">// ✅</span>
+<span class="kw">if</span> (<span class="fn">fabs</span>(x - y) &lt; <span class="nm">1e-9</span>) ...
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">OUTPUT FORMATTING</span></div>
+      <pre>
+<span class="cm">// Precision (for doubles)</span>
+cout <span class="op">&lt;&lt;</span> <span class="fn">fixed</span> <span class="op">&lt;&lt;</span> <span class="fn">setprecision</span>(<span class="nm">6</span>) <span class="op">&lt;&lt;</span> <span class="nm">3.14</span>;  <span class="cm">// 3.140000</span>
+cout <span class="op">&lt;&lt;</span> <span class="fn">scientific</span> <span class="op">&lt;&lt;</span> <span class="nm">3.14</span>;                   <span class="cm">// 3.14e+00</span>
+
+<span class="cm">// Width and fill</span>
+cout <span class="op">&lt;&lt;</span> <span class="fn">setw</span>(<span class="nm">10</span>) <span class="op">&lt;&lt;</span> <span class="nm">42</span>;          <span class="cm">// "        42"</span>
+cout <span class="op">&lt;&lt;</span> <span class="fn">setfill</span>(<span class="st">'0'</span>) <span class="op">&lt;&lt;</span> <span class="fn">setw</span>(<span class="nm">5</span>) <span class="op">&lt;&lt;</span> <span class="nm">7</span>; <span class="cm">// "00007"</span>
+cout <span class="op">&lt;&lt;</span> <span class="fn">left</span> <span class="op">&lt;&lt;</span> <span class="fn">setw</span>(<span class="nm">10</span>) <span class="op">&lt;&lt;</span> <span class="st">"hi"</span>; <span class="cm">// "hi        "</span>
+
+<span class="cm">// Number bases</span>
+cout <span class="op">&lt;&lt;</span> <span class="fn">hex</span> <span class="op">&lt;&lt;</span> <span class="nm">255</span>;              <span class="cm">// "ff"</span>
+cout <span class="op">&lt;&lt;</span> <span class="fn">oct</span> <span class="op">&lt;&lt;</span> <span class="nm">8</span>;               <span class="cm">// "10"</span>
+cout <span class="op">&lt;&lt;</span> <span class="fn">dec</span> <span class="op">&lt;&lt;</span> <span class="nm">255</span>;             <span class="cm">// "255" (reset)</span>
+cout <span class="op">&lt;&lt;</span> <span class="fn">showbase</span> <span class="op">&lt;&lt;</span> <span class="fn">hex</span> <span class="op">&lt;&lt;</span> <span class="nm">255</span>; <span class="cm">// "0xff"</span>
+
+<span class="cm">// Bool</span>
+cout <span class="op">&lt;&lt;</span> <span class="fn">boolalpha</span> <span class="op">&lt;&lt;</span> <span class="kw">true</span>;       <span class="cm">// "true"</span>
+
+<span class="cm">// Print vector (debug)</span>
+<span class="kw">auto</span> pv = [](vi<span class="op">&amp;</span> v){
+    <span class="kw">for</span>(<span class="kw">auto</span> x:v) cout<span class="op">&lt;&lt;</span>x<span class="op">&lt;&lt;</span><span class="st">" "</span>; cout<span class="op">&lt;&lt;</span><span class="st">"\n"</span>;
+};
+      </pre>
+    </div>
+
+  </div>
+  <div class="section-note">
+    <strong>Remember:</strong> Add <code>ios_base::sync_with_stdio(false); cin.tie(NULL);</code> at the top of every solution — it can reduce I/O time by 10x. Use <code>'\n'</code> instead of <code>endl</code> to avoid flushing the buffer on every line.
+  </div>
+</div>
+
+
+<div class="footer">
+  <strong>Critical reminders:</strong><br>
+  · <code>new T[]</code> must be paired with <code>delete[]</code>, never plain <code>delete</code>. &nbsp;
+  · <code>unique_ptr</code> cannot be copied — only moved. <code>shared_ptr</code> has overhead from ref-counting — don't use it everywhere. &nbsp;
+  · <code>dynamic_cast</code> requires at least one <code>virtual</code> function in the base class; otherwise it won't compile. &nbsp;
+  · <code>stoi</code>/<code>stod</code> throw <code>std::invalid_argument</code> on bad input — wrap in try-catch for untrusted input. &nbsp;
+  · Lambda capture by reference <code>[&amp;]</code> is dangerous if the lambda outlives the captured variable (e.g. in async tasks). &nbsp;
+  · <code>std::function</code> has type-erasure overhead — use <code>auto</code> for local lambdas, <code>std::function</code> only when you need to store or return them. &nbsp;
+  · Integer division truncates toward zero in C++: <code>-7/2 == -3</code>, not <code>-4</code>. &nbsp;
+  · Use <code>1LL * a * b</code> to force 64-bit multiplication even when <code>a</code> and <code>b</code> are <code>int</code>.
+</div>
+
+</div><!-- /main -->
+</body>
+</html>

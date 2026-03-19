@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C++ STL Cheat Sheet</title>
+<style>
+  :root {
+    --bg: #0f1117; --bg2: #161b22; --bg3: #1c2128; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --green: #3fb950; --orange: #d29922; --red: #f85149; --purple: #bc8cff;
+    --teal: #39d353; --yellow: #e3b341; --pink: #ff7b72;
+    --tag-init: #1f3a2a; --tag-init-t: #3fb950;
+    --tag-ins: #1a2f4a; --tag-ins-t: #58a6ff;
+    --tag-del: #3a1f1f; --tag-del-t: #f85149;
+    --tag-acc: #2e2416; --tag-acc-t: #d29922;
+    --tag-iter: #261a3a; --tag-iter-t: #bc8cff;
+    --tag-srch: #1a2e2e; --tag-srch-t: #39d353;
+    --tag-sort: #2a1f2e; --tag-sort-t: #ff7b72;
+    --tag-misc: #2a2416; --tag-misc-t: #e3b341;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, 'Segoe UI', sans-serif; font-size: 13px; line-height: 1.5; }
+  
+  .header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 20px 28px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
+  .header h1 { font-size: 20px; font-weight: 600; color: var(--text); }
+  .header p { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .legend { display: flex; gap: 8px; flex-wrap: wrap; }
+  .lbadge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+
+  .nav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; gap: 0; flex-wrap: wrap; overflow-x: auto; }
+  .nav a { display: block; padding: 10px 14px; font-size: 12px; color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent; white-space: nowrap; transition: color 0.15s; }
+  .nav a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .main { max-width: 1400px; margin: 0 auto; padding: 24px 28px; }
+  .section { margin-bottom: 32px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .section-header { background: var(--bg2); padding: 12px 18px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+  .section-header h2 { font-size: 15px; font-weight: 600; color: var(--text); }
+  .include { font-family: 'Courier New', monospace; font-size: 11px; color: var(--muted); background: var(--bg3); padding: 2px 7px; border-radius: 4px; }
+  .complexity-note { font-size: 11px; color: var(--muted); margin-left: auto; }
+
+  .ops-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 0; }
+  .op-block { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 14px 16px; }
+  .op-block:nth-child(even) { border-right: none; }
+  @media (max-width: 700px) { .ops-grid { grid-template-columns: 1fr; } .op-block { border-right: none; } }
+
+  .op-label { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+  .badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; letter-spacing: 0.02em; }
+  .b-init  { background: var(--tag-init);  color: var(--tag-init-t);  }
+  .b-ins   { background: var(--tag-ins);   color: var(--tag-ins-t);   }
+  .b-del   { background: var(--tag-del);   color: var(--tag-del-t);   }
+  .b-acc   { background: var(--tag-acc);   color: var(--tag-acc-t);   }
+  .b-iter  { background: var(--tag-iter);  color: var(--tag-iter-t);  }
+  .b-srch  { background: var(--tag-srch);  color: var(--tag-srch-t);  }
+  .b-sort  { background: var(--tag-sort);  color: var(--tag-sort-t);  }
+  .b-misc  { background: var(--tag-misc);  color: var(--tag-misc-t);  }
+
+  pre { font-family: 'Courier New', monospace; font-size: 11.5px; line-height: 1.75; white-space: pre; overflow-x: auto; }
+  .kw   { color: #ff7b72; }   /* keywords: int, auto, etc */
+  .fn   { color: #d2a8ff; }   /* functions */
+  .str  { color: #a5d6ff; }   /* string literals, types */
+  .cmt  { color: #6e7681; font-style: italic; }  /* comments */
+  .num  { color: #79c0ff; }   /* numbers */
+  .op   { color: #ffa657; }   /* operators */
+
+  .full-width { grid-column: 1 / -1; border-right: none; }
+  .section-note { padding: 8px 18px; background: var(--bg3); font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); }
+
+  /* single-column for some sections */
+  .ops-single { padding: 14px 16px; }
+
+  @media print {
+    body { background: white; color: #111; }
+    .nav { display: none; }
+    pre { font-size: 10px; }
+    .section { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>C++ STL — Complete Cheat Sheet</h1>
+    <p>All containers · All operations · Interview ready</p>
+  </div>
+  <div class="legend">
+    <span class="lbadge b-init">INIT</span>
+    <span class="lbadge b-ins">INSERT</span>
+    <span class="lbadge b-del">ERASE</span>
+    <span class="lbadge b-acc">ACCESS</span>
+    <span class="lbadge b-iter">ITERATE</span>
+    <span class="lbadge b-srch">SEARCH</span>
+    <span class="lbadge b-sort">SORT</span>
+    <span class="lbadge b-misc">MISC</span>
+  </div>
+</div>
+
+<div class="nav">
+  <a href="#vector">vector</a>
+  <a href="#string">string</a>
+  <a href="#array">array</a>
+  <a href="#list">list</a>
+  <a href="#deque">deque</a>
+  <a href="#stack">stack</a>
+  <a href="#queue">queue</a>
+  <a href="#pq">priority_queue</a>
+  <a href="#umap">unordered_map</a>
+  <a href="#map">map</a>
+  <a href="#uset">unordered_set</a>
+  <a href="#set">set</a>
+  <a href="#multiset">multiset</a>
+  <a href="#pair">pair &amp; tuple</a>
+  <a href="#algo">&lt;algorithm&gt;</a>
+</div>
+
+<div class="main">
+
+
+<!-- ═══════════════════════════════════════════════════ VECTOR ═════ -->
+<div class="section" id="vector">
+  <div class="section-header">
+    <h2>vector&lt;T&gt;</h2>
+    <span class="include">#include &lt;vector&gt;</span>
+    <span class="complexity-note">Random access O(1) · push_back amortized O(1) · insert/erase O(n)</span>
+  </div>
+  <div class="ops-grid">
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">INIT</span></div>
+      <pre>
+<span class="str">vector</span>&lt;<span class="kw">int</span>&gt; v1;                      <span class="cmt">// empty</span>
+<span class="str">vector</span>&lt;<span class="kw">int</span>&gt; v2(<span class="num">5</span>);                   <span class="cmt">// {0,0,0,0,0}</span>
+<span class="str">vector</span>&lt;<span class="kw">int</span>&gt; v3(<span class="num">5</span>, <span class="num">42</span>);              <span class="cmt">// {42,42,42,42,42}</span>
+<span class="str">vector</span>&lt;<span class="kw">int</span>&gt; v4 = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>};        <span class="cmt">// initializer list</span>
+<span class="str">vector</span>&lt;<span class="kw">int</span>&gt; v5(v4);                  <span class="cmt">// copy constructor</span>
+<span class="str">vector</span>&lt;<span class="kw">int</span>&gt; v6(v4.<span class="fn">begin</span>(), v4.<span class="fn">end</span>()); <span class="cmt">// from iterators</span>
+<span class="str">vector</span>&lt;<span class="str">vector</span>&lt;<span class="kw">int</span>&gt;&gt; v7(<span class="num">3</span>, <span class="str">vector</span>&lt;<span class="kw">int</span>&gt;(<span class="num">4</span>, <span class="num">0</span>)); <span class="cmt">// 3x4 grid of 0s</span>
+<span class="str">vector</span>&lt;<span class="kw">int</span>&gt; v8(arr, arr + n);        <span class="cmt">// from C-array</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-ins">INSERT / PUSH</span></div>
+      <pre>
+v.<span class="fn">push_back</span>(<span class="num">10</span>);                     <span class="cmt">// append to end O(1)</span>
+v.<span class="fn">emplace_back</span>(<span class="num">10</span>);                  <span class="cmt">// construct in-place at end O(1)</span>
+v.<span class="fn">insert</span>(v.<span class="fn">begin</span>(), <span class="num">5</span>);             <span class="cmt">// insert at front O(n)</span>
+v.<span class="fn">insert</span>(v.<span class="fn">begin</span>() + <span class="num">2</span>, <span class="num">5</span>);        <span class="cmt">// insert at index 2</span>
+v.<span class="fn">insert</span>(v.<span class="fn">end</span>(), <span class="num">3</span>, <span class="num">99</span>);           <span class="cmt">// insert 3 copies of 99</span>
+v.<span class="fn">insert</span>(v.<span class="fn">end</span>(), v2.<span class="fn">begin</span>(), v2.<span class="fn">end</span>()); <span class="cmt">// append vector</span>
+v.<span class="fn">assign</span>(<span class="num">5</span>, <span class="num">0</span>);                      <span class="cmt">// replace with 5 zeros</span>
+v.<span class="fn">assign</span>({<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>});                  <span class="cmt">// replace with list</span>
+v.<span class="fn">resize</span>(<span class="num">10</span>);                        <span class="cmt">// grow (fill 0) or shrink</span>
+v.<span class="fn">resize</span>(<span class="num">10</span>, <span class="num">-1</span>);                   <span class="cmt">// grow with fill value -1</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-del">ERASE / POP</span></div>
+      <pre>
+v.<span class="fn">pop_back</span>();                       <span class="cmt">// remove last O(1)</span>
+v.<span class="fn">erase</span>(v.<span class="fn">begin</span>());                 <span class="cmt">// remove first O(n)</span>
+v.<span class="fn">erase</span>(v.<span class="fn">begin</span>() + <span class="num">2</span>);            <span class="cmt">// remove at index 2</span>
+v.<span class="fn">erase</span>(v.<span class="fn">begin</span>(), v.<span class="fn">begin</span>() + <span class="num">3</span>); <span class="cmt">// remove first 3</span>
+v.<span class="fn">clear</span>();                          <span class="cmt">// remove all O(n)</span>
+<span class="cmt">// Erase-remove idiom (remove by value):</span>
+v.<span class="fn">erase</span>(<span class="fn">remove</span>(v.<span class="fn">begin</span>(),v.<span class="fn">end</span>(),<span class="num">5</span>), v.<span class="fn">end</span>());
+<span class="cmt">// Erase-remove with predicate:</span>
+v.<span class="fn">erase</span>(<span class="fn">remove_if</span>(v.<span class="fn">begin</span>(),v.<span class="fn">end</span>(),[](
+  <span class="kw">int</span> x){<span class="kw">return</span> x<span class="op">%</span><span class="num">2</span><span class="op">==</span><span class="num">0</span>;}),v.<span class="fn">end</span>());
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-acc">ACCESS</span></div>
+      <pre>
+v[<span class="num">2</span>]                               <span class="cmt">// index (no bounds check)</span>
+v.<span class="fn">at</span>(<span class="num">2</span>)                            <span class="cmt">// index (throws if OOB)</span>
+v.<span class="fn">front</span>()                          <span class="cmt">// first element</span>
+v.<span class="fn">back</span>()                           <span class="cmt">// last element</span>
+v.<span class="fn">data</span>()                           <span class="cmt">// raw pointer to array</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-iter">ITERATE</span></div>
+      <pre>
+<span class="cmt">// Index-based:</span>
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i <span class="op">&lt;</span> v.<span class="fn">size</span>(); i++) cout <span class="op">&lt;&lt;</span> v[i];
+
+<span class="cmt">// Range-based (read):</span>
+<span class="kw">for</span> (<span class="kw">auto</span> x : v) cout <span class="op">&lt;&lt;</span> x;
+
+<span class="cmt">// Range-based (modify):</span>
+<span class="kw">for</span> (<span class="kw">auto</span><span class="op">&amp;</span> x : v) x <span class="op">*=</span> <span class="num">2</span>;
+
+<span class="cmt">// Iterator:</span>
+<span class="kw">for</span> (<span class="kw">auto</span> it = v.<span class="fn">begin</span>(); it <span class="op">!=</span> v.<span class="fn">end</span>(); it++) cout <span class="op">&lt;&lt;</span> <span class="op">*</span>it;
+
+<span class="cmt">// Reverse:</span>
+<span class="kw">for</span> (<span class="kw">auto</span> it = v.<span class="fn">rbegin</span>(); it <span class="op">!=</span> v.<span class="fn">rend</span>(); it++) cout <span class="op">&lt;&lt;</span> <span class="op">*</span>it;
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-srch">SEARCH</span></div>
+      <pre>
+<span class="cmt">// Linear search (unsorted):</span>
+<span class="kw">auto</span> it = <span class="fn">find</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="num">5</span>);
+<span class="kw">if</span> (it <span class="op">!=</span> v.<span class="fn">end</span>()) <span class="cmt">// found at index: it-v.begin()</span>
+
+<span class="cmt">// Binary search (MUST be sorted):</span>
+<span class="fn">binary_search</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="num">5</span>); <span class="cmt">// true/false</span>
+<span class="fn">lower_bound</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="num">5</span>);  <span class="cmt">// iter to first >= 5</span>
+<span class="fn">upper_bound</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="num">5</span>);  <span class="cmt">// iter to first >  5</span>
+
+<span class="cmt">// Count occurrences:</span>
+<span class="fn">count</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="num">5</span>);
+<span class="fn">count_if</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), [](<span class="kw">int</span> x){<span class="kw">return</span> x<span class="op">&gt;</span><span class="num">3</span>;});
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-sort">SORT / REVERSE</span></div>
+      <pre>
+<span class="fn">sort</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());           <span class="cmt">// ascending O(n log n)</span>
+<span class="fn">sort</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="fn">greater</span>&lt;<span class="kw">int</span>&gt;()); <span class="cmt">// descending</span>
+<span class="fn">sort</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), [](<span class="kw">int</span> a, <span class="kw">int</span> b){<span class="kw">return</span> a<span class="op">&lt;</span>b;});
+<span class="fn">stable_sort</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());    <span class="cmt">// preserves equal order</span>
+<span class="fn">reverse</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());        <span class="cmt">// in-place reverse</span>
+<span class="fn">nth_element</span>(v.<span class="fn">begin</span>(),v.<span class="fn">begin</span>()+k,v.<span class="fn">end</span>()); <span class="cmt">// kth element</span>
+<span class="fn">partial_sort</span>(v.<span class="fn">begin</span>(),v.<span class="fn">begin</span>()+k,v.<span class="fn">end</span>()); <span class="cmt">// first k sorted</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">MISC</span></div>
+      <pre>
+v.<span class="fn">size</span>()                           <span class="cmt">// number of elements</span>
+v.<span class="fn">empty</span>()                          <span class="cmt">// true if empty</span>
+v.<span class="fn">capacity</span>()                       <span class="cmt">// allocated memory</span>
+v.<span class="fn">reserve</span>(<span class="num">100</span>)                     <span class="cmt">// pre-allocate capacity</span>
+v.<span class="fn">shrink_to_fit</span>()                  <span class="cmt">// release excess memory</span>
+<span class="fn">swap</span>(v1, v2)                       <span class="cmt">// swap two vectors O(1)</span>
+<span class="fn">min_element</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>())    <span class="cmt">// iterator to min</span>
+<span class="fn">max_element</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>())    <span class="cmt">// iterator to max</span>
+<span class="fn">accumulate</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="num">0</span>) <span class="cmt">// sum (needs &lt;numeric&gt;)</span>
+<span class="fn">fill</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="num">0</span>)       <span class="cmt">// set all to 0</span>
+<span class="fn">iota</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>(), <span class="num">1</span>)       <span class="cmt">// fill 1,2,3,... (&lt;numeric&gt;)</span>
+<span class="fn">unique</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>())        <span class="cmt">// remove consec dups (sort first!)</span>
+      </pre>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ STRING ═════ -->
+<div class="section" id="string">
+  <div class="section-header">
+    <h2>string</h2>
+    <span class="include">#include &lt;string&gt;</span>
+    <span class="complexity-note">Random access O(1) · append O(1) amortized · find O(n·m)</span>
+  </div>
+  <div class="ops-grid">
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">INIT</span></div>
+      <pre>
+<span class="str">string</span> s1;                          <span class="cmt">// empty</span>
+<span class="str">string</span> s2 = <span class="str">"hello"</span>;
+<span class="str">string</span> s3(<span class="str">"hello"</span>);
+<span class="str">string</span> s4(<span class="num">5</span>, <span class="str">'a'</span>);                 <span class="cmt">// "aaaaa"</span>
+<span class="str">string</span> s5(s2.<span class="fn">begin</span>(), s2.<span class="fn">end</span>());   <span class="cmt">// copy from iterators</span>
+<span class="str">string</span> s6 = s2.<span class="fn">substr</span>(<span class="num">1</span>, <span class="num">3</span>);      <span class="cmt">// "ell" (start, len)</span>
+<span class="str">string</span> s7(<span class="str">"hello"</span>, <span class="num">3</span>);            <span class="cmt">// "hel" (first 3 chars)</span>
+
+<span class="cmt">// Conversions:</span>
+<span class="str">string</span> s8 = <span class="fn">to_string</span>(<span class="num">42</span>);
+<span class="kw">int</span> n = <span class="fn">stoi</span>(s2);
+<span class="kw">long long</span> ll = <span class="fn">stoll</span>(s2);
+<span class="kw">double</span> d = <span class="fn">stod</span>(s2);
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-ins">INSERT / APPEND</span></div>
+      <pre>
+s <span class="op">+=</span> <span class="str">"world"</span>;                      <span class="cmt">// append string</span>
+s <span class="op">+=</span> <span class="str">'!'</span>;                          <span class="cmt">// append char</span>
+s.<span class="fn">append</span>(<span class="str">"abc"</span>);                   <span class="cmt">// append</span>
+s.<span class="fn">append</span>(<span class="num">3</span>, <span class="str">'x'</span>);                 <span class="cmt">// append "xxx"</span>
+s.<span class="fn">push_back</span>(<span class="str">'c'</span>);                 <span class="cmt">// append single char</span>
+s.<span class="fn">insert</span>(<span class="num">2</span>, <span class="str">"XY"</span>);                <span class="cmt">// insert at pos 2</span>
+s.<span class="fn">insert</span>(<span class="num">2</span>, <span class="num">3</span>, <span class="str">'x'</span>);              <span class="cmt">// insert 3 x's at pos 2</span>
+s.<span class="fn">replace</span>(<span class="num">1</span>, <span class="num">3</span>, <span class="str">"XY"</span>);            <span class="cmt">// replace pos 1, len 3 with "XY"</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-del">ERASE</span></div>
+      <pre>
+s.<span class="fn">pop_back</span>();                      <span class="cmt">// remove last char</span>
+s.<span class="fn">erase</span>(<span class="num">2</span>);                        <span class="cmt">// erase from pos 2 to end</span>
+s.<span class="fn">erase</span>(<span class="num">2</span>, <span class="num">3</span>);                    <span class="cmt">// erase 3 chars from pos 2</span>
+s.<span class="fn">erase</span>(s.<span class="fn">begin</span>(), s.<span class="fn">begin</span>()+<span class="num">2</span>); <span class="cmt">// erase via iterators</span>
+s.<span class="fn">clear</span>();                         <span class="cmt">// empty the string</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-acc">ACCESS</span></div>
+      <pre>
+s[<span class="num">2</span>]                               <span class="cmt">// char at index (no check)</span>
+s.<span class="fn">at</span>(<span class="num">2</span>)                            <span class="cmt">// char at index (throws OOB)</span>
+s.<span class="fn">front</span>()                          <span class="cmt">// first char</span>
+s.<span class="fn">back</span>()                           <span class="cmt">// last char</span>
+s.<span class="fn">substr</span>(<span class="num">2</span>)                        <span class="cmt">// substring from pos 2</span>
+s.<span class="fn">substr</span>(<span class="num">2</span>, <span class="num">4</span>)                    <span class="cmt">// 4 chars from pos 2</span>
+s.<span class="fn">c_str</span>()                          <span class="cmt">// const char* (C-style)</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-iter">ITERATE</span></div>
+      <pre>
+<span class="kw">for</span> (<span class="kw">char</span> c : s) cout <span class="op">&lt;&lt;</span> c;
+
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i <span class="op">&lt;</span> s.<span class="fn">size</span>(); i++) cout <span class="op">&lt;&lt;</span> s[i];
+
+<span class="kw">for</span> (<span class="kw">auto</span> it = s.<span class="fn">begin</span>(); it <span class="op">!=</span> s.<span class="fn">end</span>(); it++) cout <span class="op">&lt;&lt;</span> <span class="op">*</span>it;
+
+<span class="kw">for</span> (<span class="kw">auto</span> it = s.<span class="fn">rbegin</span>(); it <span class="op">!=</span> s.<span class="fn">rend</span>(); it++) cout <span class="op">&lt;&lt;</span> <span class="op">*</span>it; <span class="cmt">// reverse</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-srch">SEARCH</span></div>
+      <pre>
+s.<span class="fn">find</span>(<span class="str">"lo"</span>)                       <span class="cmt">// first pos, or string::npos</span>
+s.<span class="fn">find</span>(<span class="str">"lo"</span>, <span class="num">3</span>)                   <span class="cmt">// search from pos 3</span>
+s.<span class="fn">rfind</span>(<span class="str">"lo"</span>)                      <span class="cmt">// last occurrence</span>
+s.<span class="fn">find_first_of</span>(<span class="str">"aeiou"</span>)           <span class="cmt">// first vowel pos</span>
+s.<span class="fn">find_last_of</span>(<span class="str">"aeiou"</span>)            <span class="cmt">// last vowel pos</span>
+s.<span class="fn">find_first_not_of</span>(<span class="str">"abc"</span>)         <span class="cmt">// first char not in set</span>
+
+<span class="cmt">// Check if found:</span>
+<span class="kw">if</span> (s.<span class="fn">find</span>(<span class="str">"lo"</span>) <span class="op">!=</span> <span class="str">string</span>::<span class="fn">npos</span>) { <span class="cmt">/* found */</span> }
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-sort">SORT / REVERSE</span></div>
+      <pre>
+<span class="fn">sort</span>(s.<span class="fn">begin</span>(), s.<span class="fn">end</span>());           <span class="cmt">// sort chars ascending</span>
+<span class="fn">sort</span>(s.<span class="fn">begin</span>(), s.<span class="fn">end</span>(), <span class="fn">greater</span>&lt;<span class="kw">char</span>&gt;());
+<span class="fn">reverse</span>(s.<span class="fn">begin</span>(), s.<span class="fn">end</span>());        <span class="cmt">// reverse in-place</span>
+<span class="fn">next_permutation</span>(s.<span class="fn">begin</span>(), s.<span class="fn">end</span>()); <span class="cmt">// next lex permutation</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">MISC</span></div>
+      <pre>
+s.<span class="fn">size</span>()  <span class="cmt">/ </span>s.<span class="fn">length</span>()             <span class="cmt">// number of chars</span>
+s.<span class="fn">empty</span>()                          <span class="cmt">// true if empty</span>
+s1 <span class="op">+</span> s2                            <span class="cmt">// concatenation (new string)</span>
+s1 <span class="op">==</span> s2 <span class="cmt">/ </span>s1 <span class="op">&lt;</span> s2               <span class="cmt">// comparison (lexicographic)</span>
+s.<span class="fn">compare</span>(s2)                      <span class="cmt">// 0 if equal</span>
+<span class="fn">tolower</span>(s[i]) <span class="cmt">/ </span><span class="fn">toupper</span>(s[i])    <span class="cmt">// char conversion</span>
+<span class="fn">isalpha</span>(c) <span class="cmt">/ </span><span class="fn">isdigit</span>(c) <span class="cmt">/ </span><span class="fn">isspace</span>(c)
+<span class="fn">getline</span>(cin, s)                    <span class="cmt">// read full line with spaces</span>
+      </pre>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ ARRAY ═════ -->
+<div class="section" id="array">
+  <div class="section-header">
+    <h2>array&lt;T, N&gt;</h2>
+    <span class="include">#include &lt;array&gt;</span>
+    <span class="complexity-note">Fixed size at compile time · All access O(1) · No push/pop</span>
+  </div>
+  <div class="ops-grid">
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">INIT</span></div>
+      <pre>
+<span class="str">array</span>&lt;<span class="kw">int</span>, <span class="num">5</span>&gt; a1 = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>};
+<span class="str">array</span>&lt;<span class="kw">int</span>, <span class="num">5</span>&gt; a2{};                 <span class="cmt">// zero-initialized</span>
+<span class="str">array</span>&lt;<span class="kw">int</span>, <span class="num">5</span>&gt; a3;                   <span class="cmt">// uninitialized (be careful)</span>
+a3.<span class="fn">fill</span>(<span class="num">0</span>);                         <span class="cmt">// fill all with 0</span>
+      </pre>
+    </div>
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-acc">ACCESS</span> <span class="badge b-iter" style="margin-left:4px;">ITERATE</span> <span class="badge b-sort" style="margin-left:4px;">SORT</span></div>
+      <pre>
+a[<span class="num">2</span>]  <span class="cmt">/</span>  a.<span class="fn">at</span>(<span class="num">2</span>)                   <span class="cmt">// element access</span>
+a.<span class="fn">front</span>() <span class="cmt">/</span> a.<span class="fn">back</span>()               <span class="cmt">// first / last</span>
+a.<span class="fn">size</span>() <span class="cmt">/</span> a.<span class="fn">empty</span>()               <span class="cmt">// count / empty check</span>
+a.<span class="fn">data</span>()                           <span class="cmt">// raw pointer</span>
+
+<span class="kw">for</span> (<span class="kw">auto</span> x : a) cout <span class="op">&lt;&lt;</span> x;        <span class="cmt">// range-for</span>
+<span class="fn">sort</span>(a.<span class="fn">begin</span>(), a.<span class="fn">end</span>());           <span class="cmt">// sort</span>
+<span class="fn">reverse</span>(a.<span class="fn">begin</span>(), a.<span class="fn">end</span>());        <span class="cmt">// reverse</span>
+<span class="fn">swap</span>(a1, a2);                       <span class="cmt">// swap arrays (same size)</span>
+      </pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ LIST ═════ -->
+<div class="section" id="list">
+  <div class="section-header">
+    <h2>list&lt;T&gt; &nbsp;(doubly linked)</h2>
+    <span class="include">#include &lt;list&gt;</span>
+    <span class="complexity-note">Insert/delete at iterator O(1) · No random access · LRU cache use case</span>
+  </div>
+  <div class="ops-grid">
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">INIT</span></div>
+      <pre>
+<span class="str">list</span>&lt;<span class="kw">int</span>&gt; l1;                       <span class="cmt">// empty</span>
+<span class="str">list</span>&lt;<span class="kw">int</span>&gt; l2 = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>};
+<span class="str">list</span>&lt;<span class="kw">int</span>&gt; l3(<span class="num">5</span>, <span class="num">0</span>);               <span class="cmt">// 5 zeros</span>
+<span class="str">list</span>&lt;<span class="kw">int</span>&gt; l4(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>()); <span class="cmt">// from vector</span>
+      </pre>
+    </div>
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-ins">INSERT</span></div>
+      <pre>
+l.<span class="fn">push_front</span>(<span class="num">1</span>);                   <span class="cmt">// prepend O(1)</span>
+l.<span class="fn">push_back</span>(<span class="num">5</span>);                    <span class="cmt">// append O(1)</span>
+l.<span class="fn">emplace_front</span>(<span class="num">1</span>);               <span class="cmt">// construct in-place front</span>
+l.<span class="fn">emplace_back</span>(<span class="num">5</span>);                <span class="cmt">// construct in-place back</span>
+<span class="kw">auto</span> it = l.<span class="fn">begin</span>(); <span class="fn">advance</span>(it,<span class="num">2</span>);
+l.<span class="fn">insert</span>(it, <span class="num">99</span>);                  <span class="cmt">// insert before iterator O(1)</span>
+l.<span class="fn">insert</span>(it, <span class="num">3</span>, <span class="num">99</span>);              <span class="cmt">// insert 3 copies</span>
+l.<span class="fn">splice</span>(it, l2);                  <span class="cmt">// move all of l2 before it</span>
+l.<span class="fn">splice</span>(it, l2, l2.<span class="fn">begin</span>());     <span class="cmt">// move one element</span>
+      </pre>
+    </div>
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-del">ERASE</span></div>
+      <pre>
+l.<span class="fn">pop_front</span>();                     <span class="cmt">// remove first O(1)</span>
+l.<span class="fn">pop_back</span>();                      <span class="cmt">// remove last O(1)</span>
+l.<span class="fn">erase</span>(it);                       <span class="cmt">// remove at iterator O(1)</span>
+l.<span class="fn">erase</span>(it1, it2);                 <span class="cmt">// remove range</span>
+l.<span class="fn">remove</span>(<span class="num">5</span>);                       <span class="cmt">// remove all elements == 5</span>
+l.<span class="fn">remove_if</span>([](<span class="kw">int</span> x){<span class="kw">return</span> x<span class="op">&lt;</span><span class="num">0</span>;}); <span class="cmt">// remove by predicate</span>
+l.<span class="fn">unique</span>();                        <span class="cmt">// remove consecutive dups</span>
+l.<span class="fn">clear</span>();
+      </pre>
+    </div>
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-acc">ACCESS</span> <span class="badge b-iter" style="margin-left:4px;">ITERATE</span> <span class="badge b-sort" style="margin-left:4px;">SORT</span></div>
+      <pre>
+l.<span class="fn">front</span>() <span class="cmt">/</span> l.<span class="fn">back</span>()               <span class="cmt">// no random access!</span>
+l.<span class="fn">size</span>() <span class="cmt">/</span> l.<span class="fn">empty</span>()
+
+<span class="kw">for</span> (<span class="kw">auto</span> x : l) cout <span class="op">&lt;&lt;</span> x;
+<span class="kw">for</span> (<span class="kw">auto</span> it = l.<span class="fn">begin</span>(); it <span class="op">!=</span> l.<span class="fn">end</span>(); ++it) cout <span class="op">&lt;&lt;</span> <span class="op">*</span>it;
+
+l.<span class="fn">sort</span>();                          <span class="cmt">// list has its own sort O(n log n)</span>
+l.<span class="fn">sort</span>(<span class="fn">greater</span>&lt;<span class="kw">int</span>&gt;());
+l.<span class="fn">reverse</span>();                       <span class="cmt">// list has its own reverse O(n)</span>
+l.<span class="fn">merge</span>(l2);                       <span class="cmt">// merge two sorted lists</span>
+      </pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ DEQUE ═════ -->
+<div class="section" id="deque">
+  <div class="section-header">
+    <h2>deque&lt;T&gt;</h2>
+    <span class="include">#include &lt;deque&gt;</span>
+    <span class="complexity-note">Push/pop both ends O(1) · Random access O(1) · Sliding window max</span>
+  </div>
+  <div class="ops-grid">
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">INIT</span> <span class="badge b-ins" style="margin-left:4px;">INSERT</span></div>
+      <pre>
+<span class="str">deque</span>&lt;<span class="kw">int</span>&gt; dq;
+<span class="str">deque</span>&lt;<span class="kw">int</span>&gt; dq2 = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>};
+<span class="str">deque</span>&lt;<span class="kw">int</span>&gt; dq3(<span class="num">5</span>, <span class="num">0</span>);
+
+dq.<span class="fn">push_front</span>(<span class="num">1</span>);                  <span class="cmt">// O(1)</span>
+dq.<span class="fn">push_back</span>(<span class="num">5</span>);                   <span class="cmt">// O(1)</span>
+dq.<span class="fn">emplace_front</span>(<span class="num">1</span>);
+dq.<span class="fn">emplace_back</span>(<span class="num">5</span>);
+dq.<span class="fn">insert</span>(dq.<span class="fn">begin</span>()+<span class="num">2</span>, <span class="num">99</span>);      <span class="cmt">// O(n)</span>
+      </pre>
+    </div>
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-del">ERASE</span> <span class="badge b-acc" style="margin-left:4px;">ACCESS</span> <span class="badge b-iter" style="margin-left:4px;">ITERATE</span></div>
+      <pre>
+dq.<span class="fn">pop_front</span>();                    <span class="cmt">// O(1)</span>
+dq.<span class="fn">pop_back</span>();                     <span class="cmt">// O(1)</span>
+dq.<span class="fn">erase</span>(dq.<span class="fn">begin</span>() + <span class="num">2</span>);
+
+dq[<span class="num">2</span>] <span class="cmt">/</span> dq.<span class="fn">at</span>(<span class="num">2</span>)                  <span class="cmt">// random access O(1)</span>
+dq.<span class="fn">front</span>() <span class="cmt">/</span> dq.<span class="fn">back</span>()
+dq.<span class="fn">size</span>() <span class="cmt">/</span> dq.<span class="fn">empty</span>()
+
+<span class="kw">for</span> (<span class="kw">auto</span> x : dq) cout <span class="op">&lt;&lt;</span> x;
+<span class="fn">sort</span>(dq.<span class="fn">begin</span>(), dq.<span class="fn">end</span>());
+      </pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ STACK ═════ -->
+<div class="section" id="stack">
+  <div class="section-header">
+    <h2>stack&lt;T&gt;</h2>
+    <span class="include">#include &lt;stack&gt;</span>
+    <span class="complexity-note">All operations O(1) · LIFO · No iteration · No search</span>
+  </div>
+  <div class="ops-grid">
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">INIT</span></div>
+      <pre>
+<span class="str">stack</span>&lt;<span class="kw">int</span>&gt; st;                      <span class="cmt">// default (uses deque)</span>
+<span class="str">stack</span>&lt;<span class="kw">int</span>, <span class="str">vector</span>&lt;<span class="kw">int</span>&gt;&gt; st2;      <span class="cmt">// backed by vector</span>
+
+<span class="cmt">// Initialize from deque:</span>
+<span class="str">deque</span>&lt;<span class="kw">int</span>&gt; dq = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>};
+<span class="str">stack</span>&lt;<span class="kw">int</span>&gt; st3(dq);                <span class="cmt">// top = 3</span>
+      </pre>
+    </div>
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-ins">PUSH</span> <span class="badge b-del" style="margin-left:4px;">POP</span> <span class="badge b-acc" style="margin-left:4px;">ACCESS</span> <span class="badge b-misc" style="margin-left:4px;">MISC</span></div>
+      <pre>
+st.<span class="fn">push</span>(<span class="num">10</span>);                       <span class="cmt">// push to top O(1)</span>
+st.<span class="fn">emplace</span>(<span class="num">10</span>);                    <span class="cmt">// construct in-place O(1)</span>
+st.<span class="fn">pop</span>();                          <span class="cmt">// remove top O(1) — returns void!</span>
+st.<span class="fn">top</span>();                          <span class="cmt">// peek top O(1)</span>
+st.<span class="fn">size</span>() <span class="cmt">/</span> st.<span class="fn">empty</span>()
+<span class="fn">swap</span>(st1, st2);
+
+<span class="cmt">// Correct pop pattern:</span>
+<span class="kw">int</span> val = st.<span class="fn">top</span>(); st.<span class="fn">pop</span>();
+
+<span class="cmt">// To iterate (destructive):</span>
+<span class="kw">while</span> (<span class="op">!</span>st.<span class="fn">empty</span>()) {
+    cout <span class="op">&lt;&lt;</span> st.<span class="fn">top</span>(); st.<span class="fn">pop</span>();
+}
+      </pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ QUEUE ═════ -->
+<div class="section" id="queue">
+  <div class="section-header">
+    <h2>queue&lt;T&gt;</h2>
+    <span class="include">#include &lt;queue&gt;</span>
+    <span class="complexity-note">All operations O(1) · FIFO · BFS use case</span>
+  </div>
+  <div class="ops-grid">
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">INIT</span></div>
+      <pre>
+<span class="str">queue</span>&lt;<span class="kw">int</span>&gt; q;                       <span class="cmt">// empty queue</span>
+<span class="str">queue</span>&lt;<span class="kw">int</span>, <span class="str">list</span>&lt;<span class="kw">int</span>&gt;&gt; q2;          <span class="cmt">// backed by list</span>
+
+<span class="str">deque</span>&lt;<span class="kw">int</span>&gt; dq = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>};
+<span class="str">queue</span>&lt;<span class="kw">int</span>&gt; q3(dq);                 <span class="cmt">// front = 1, back = 3</span>
+      </pre>
+    </div>
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-ins">PUSH</span> <span class="badge b-del" style="margin-left:4px;">POP</span> <span class="badge b-acc" style="margin-left:4px;">ACCESS</span> <span class="badge b-misc" style="margin-left:4px;">MISC</span></div>
+      <pre>
+q.<span class="fn">push</span>(<span class="num">10</span>);                        <span class="cmt">// enqueue at back O(1)</span>
+q.<span class="fn">emplace</span>(<span class="num">10</span>);                     <span class="cmt">// construct in-place O(1)</span>
+q.<span class="fn">pop</span>();                           <span class="cmt">// dequeue from front — returns void!</span>
+q.<span class="fn">front</span>();                         <span class="cmt">// peek front O(1)</span>
+q.<span class="fn">back</span>();                          <span class="cmt">// peek back O(1)</span>
+q.<span class="fn">size</span>() <span class="cmt">/</span> q.<span class="fn">empty</span>()
+
+<span class="cmt">// BFS pattern:</span>
+<span class="str">queue</span>&lt;<span class="kw">int</span>&gt; bfs;
+bfs.<span class="fn">push</span>(src);
+<span class="kw">while</span> (<span class="op">!</span>bfs.<span class="fn">empty</span>()) {
+    <span class="kw">int</span> node = bfs.<span class="fn">front</span>(); bfs.<span class="fn">pop</span>();
+    <span class="kw">for</span> (<span class="kw">int</span> nb : adj[node]) bfs.<span class="fn">push</span>(nb);
+}
+      </pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ PRIORITY QUEUE ═════ -->
+<div class="section" id="pq">
+  <div class="section-header">
+    <h2>priority_queue&lt;T&gt;</h2>
+    <span class="include">#include &lt;queue&gt;</span>
+    <span class="complexity-note">push/pop O(log n) · top O(1) · Max-heap by default</span>
+  </div>
+  <div class="ops-grid">
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">INIT</span></div>
+      <pre>
+<span class="cmt">// Max-heap (default):</span>
+<span class="str">priority_queue</span>&lt;<span class="kw">int</span>&gt; maxpq;
+
+<span class="cmt">// Min-heap:</span>
+<span class="str">priority_queue</span>&lt;<span class="kw">int</span>, <span class="str">vector</span>&lt;<span class="kw">int</span>&gt;, <span class="fn">greater</span>&lt;<span class="kw">int</span>&gt;&gt; minpq;
+
+<span class="cmt">// Heap of pairs (max by first):</span>
+<span class="str">priority_queue</span>&lt;<span class="str">pair</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt;&gt; pq;
+
+<span class="cmt">// Min-heap of pairs:</span>
+<span class="str">priority_queue</span>&lt;<span class="str">pair</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt;,
+  <span class="str">vector</span>&lt;<span class="str">pair</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt;&gt;,
+  <span class="fn">greater</span>&lt;<span class="str">pair</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt;&gt;&gt; minpq2;
+
+<span class="cmt">// Custom comparator (min by second):</span>
+<span class="kw">auto</span> cmp = [](<span class="str">pair</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt; a, <span class="str">pair</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt; b){
+    <span class="kw">return</span> a.second <span class="op">&gt;</span> b.second; <span class="cmt">// min on second</span>
+};
+<span class="str">priority_queue</span>&lt;<span class="str">pair</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt;,
+  <span class="str">vector</span>&lt;<span class="str">pair</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt;&gt;,
+  <span class="kw">decltype</span>(cmp)&gt; custpq(cmp);
+
+<span class="cmt">// From vector (heapify):</span>
+<span class="str">vector</span>&lt;<span class="kw">int</span>&gt; v = {<span class="num">3</span>,<span class="num">1</span>,<span class="num">4</span>,<span class="num">1</span>,<span class="num">5</span>};
+<span class="str">priority_queue</span>&lt;<span class="kw">int</span>&gt; pq2(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());
+      </pre>
+    </div>
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-ins">PUSH</span> <span class="badge b-del" style="margin-left:4px;">POP</span> <span class="badge b-acc" style="margin-left:4px;">ACCESS</span> <span class="badge b-misc" style="margin-left:4px;">MISC</span></div>
+      <pre>
+pq.<span class="fn">push</span>(<span class="num">10</span>);                       <span class="cmt">// insert O(log n)</span>
+pq.<span class="fn">emplace</span>(<span class="num">10</span>);                    <span class="cmt">// construct in-place O(log n)</span>
+pq.<span class="fn">pop</span>();                          <span class="cmt">// remove top O(log n) — void!</span>
+pq.<span class="fn">top</span>();                          <span class="cmt">// peek max/min O(1)</span>
+pq.<span class="fn">size</span>() <span class="cmt">/</span> pq.<span class="fn">empty</span>()
+
+<span class="cmt">// No iteration, no search, no update of elements!</span>
+
+<span class="cmt">// Drain pattern:</span>
+<span class="kw">while</span> (<span class="op">!</span>pq.<span class="fn">empty</span>()) {
+    cout <span class="op">&lt;&lt;</span> pq.<span class="fn">top</span>(); pq.<span class="fn">pop</span>();
+}
+
+<span class="cmt">// Lazy deletion trick:</span>
+<span class="str">unordered_set</span>&lt;<span class="kw">int</span>&gt; deleted;
+pq.<span class="fn">push</span>(x);
+deleted.<span class="fn">insert</span>(y);               <span class="cmt">// mark y as deleted</span>
+<span class="kw">while</span> (deleted.<span class="fn">count</span>(pq.<span class="fn">top</span>())) pq.<span class="fn">pop</span>();
+      </pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ UNORDERED_MAP ═════ -->
+<div class="section" id="umap">
+  <div class="section-header">
+    <h2>unordered_map&lt;K, V&gt;</h2>
+    <span class="include">#include &lt;unordered_map&gt;</span>
+    <span class="complexity-note">Average O(1) lookup/insert/erase · Worst O(n) · No ordering</span>
+  </div>
+  <div class="ops-grid">
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">INIT</span></div>
+      <pre>
+<span class="str">unordered_map</span>&lt;<span class="str">string</span>,<span class="kw">int</span>&gt; mp;
+<span class="str">unordered_map</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt; mp2 = {{<span class="num">1</span>,<span class="num">10</span>},{<span class="num">2</span>,<span class="num">20</span>}};
+<span class="str">unordered_map</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt; mp3(mp2);   <span class="cmt">// copy</span>
+mp.<span class="fn">reserve</span>(<span class="num">100</span>);                   <span class="cmt">// avoid rehashing</span>
+mp.<span class="fn">max_load_factor</span>(<span class="num">0.25</span>);          <span class="cmt">// prevent worst-case</span>
+
+<span class="cmt">// Frequency map pattern:</span>
+<span class="str">unordered_map</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt; freq;
+<span class="kw">for</span> (<span class="kw">int</span> x : v) freq[x]<span class="op">++</span>;
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-ins">INSERT</span></div>
+      <pre>
+mp[<span class="str">"key"</span>] = <span class="num">5</span>;                     <span class="cmt">// assign (creates if missing)</span>
+mp.<span class="fn">insert</span>({<span class="str">"key"</span>, <span class="num">5</span>});             <span class="cmt">// insert pair (no overwrite)</span>
+mp.<span class="fn">insert_or_assign</span>(<span class="str">"key"</span>, <span class="num">5</span>);    <span class="cmt">// insert or update C++17</span>
+mp.<span class="fn">emplace</span>(<span class="str">"key"</span>, <span class="num">5</span>);             <span class="cmt">// construct in-place</span>
+mp.<span class="fn">try_emplace</span>(<span class="str">"key"</span>, <span class="num">5</span>);         <span class="cmt">// insert only if missing C++17</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-del">ERASE</span></div>
+      <pre>
+mp.<span class="fn">erase</span>(<span class="str">"key"</span>);                   <span class="cmt">// erase by key</span>
+mp.<span class="fn">erase</span>(mp.<span class="fn">find</span>(<span class="str">"key"</span>));         <span class="cmt">// erase by iterator</span>
+mp.<span class="fn">erase</span>(it1, it2);               <span class="cmt">// erase range</span>
+mp.<span class="fn">clear</span>();
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-acc">ACCESS</span></div>
+      <pre>
+mp[<span class="str">"key"</span>]                          <span class="cmt">// value (inserts 0 if missing!)</span>
+mp.<span class="fn">at</span>(<span class="str">"key"</span>)                      <span class="cmt">// throws if key missing</span>
+mp.<span class="fn">count</span>(<span class="str">"key"</span>)                   <span class="cmt">// 0 or 1 (exists check)</span>
+mp.<span class="fn">find</span>(<span class="str">"key"</span>)                    <span class="cmt">// iterator (or end())</span>
+mp.<span class="fn">contains</span>(<span class="str">"key"</span>)               <span class="cmt">// C++20: true/false</span>
+
+<span class="cmt">// Safe access pattern:</span>
+<span class="kw">if</span> (mp.<span class="fn">count</span>(<span class="str">"key"</span>)) cout <span class="op">&lt;&lt;</span> mp[<span class="str">"key"</span>];
+<span class="kw">auto</span> it = mp.<span class="fn">find</span>(<span class="str">"key"</span>);
+<span class="kw">if</span> (it <span class="op">!=</span> mp.<span class="fn">end</span>()) cout <span class="op">&lt;&lt;</span> it<span class="op">-&gt;</span>second;
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-iter">ITERATE</span></div>
+      <pre>
+<span class="cmt">// Key-value pairs:</span>
+<span class="kw">for</span> (<span class="kw">auto</span><span class="op">&amp;</span> [k, v] : mp) cout <span class="op">&lt;&lt;</span> k <span class="op">&lt;&lt;</span> <span class="str">" "</span> <span class="op">&lt;&lt;</span> v;
+
+<span class="cmt">// Classic iterator:</span>
+<span class="kw">for</span> (<span class="kw">auto</span> it = mp.<span class="fn">begin</span>(); it <span class="op">!=</span> mp.<span class="fn">end</span>(); it++) {
+    cout <span class="op">&lt;&lt;</span> it<span class="op">-&gt;</span>first <span class="op">&lt;&lt;</span> <span class="str">" "</span> <span class="op">&lt;&lt;</span> it<span class="op">-&gt;</span>second;
+}
+
+<span class="cmt">// Keys only:</span>
+<span class="kw">for</span> (<span class="kw">auto</span><span class="op">&amp;</span> [k, _] : mp) cout <span class="op">&lt;&lt;</span> k;
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">MISC</span></div>
+      <pre>
+mp.<span class="fn">size</span>() <span class="cmt">/</span> mp.<span class="fn">empty</span>()
+mp.<span class="fn">bucket_count</span>()                  <span class="cmt">// number of hash buckets</span>
+mp.<span class="fn">load_factor</span>()                   <span class="cmt">// size / bucket_count</span>
+<span class="fn">swap</span>(mp1, mp2);
+
+<span class="cmt">// unordered_multimap allows duplicate keys:</span>
+<span class="str">unordered_multimap</span>&lt;<span class="str">string</span>,<span class="kw">int</span>&gt; mmp;
+mmp.<span class="fn">insert</span>({<span class="str">"a"</span>, <span class="num">1</span>}); mmp.<span class="fn">insert</span>({<span class="str">"a"</span>, <span class="num">2</span>});
+<span class="kw">auto</span> range = mmp.<span class="fn">equal_range</span>(<span class="str">"a"</span>); <span class="cmt">// all values for "a"</span>
+      </pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ MAP ═════ -->
+<div class="section" id="map">
+  <div class="section-header">
+    <h2>map&lt;K, V&gt; &nbsp;(ordered)</h2>
+    <span class="include">#include &lt;map&gt;</span>
+    <span class="complexity-note">All operations O(log n) · Sorted by key · BST internally</span>
+  </div>
+  <div class="ops-grid">
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">INIT</span></div>
+      <pre>
+<span class="str">map</span>&lt;<span class="str">string</span>,<span class="kw">int</span>&gt; mp;
+<span class="str">map</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt; mp2 = {{<span class="num">3</span>,<span class="num">30</span>},{<span class="num">1</span>,<span class="num">10</span>}}; <span class="cmt">// auto sorted: 1,3</span>
+
+<span class="cmt">// Reverse order (descending keys):</span>
+<span class="str">map</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>,<span class="fn">greater</span>&lt;<span class="kw">int</span>&gt;&gt; rmp;
+
+<span class="cmt">// Custom key comparator:</span>
+<span class="kw">auto</span> cmp = [](<span class="str">string</span> a, <span class="str">string</span> b){<span class="kw">return</span> a.<span class="fn">size</span>()<span class="op">&lt;</span>b.<span class="fn">size</span>();};
+<span class="str">map</span>&lt;<span class="str">string</span>,<span class="kw">int</span>,<span class="kw">decltype</span>(cmp)&gt; cmp_mp(cmp);
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-ins">INSERT</span> <span class="badge b-del" style="margin-left:4px;">ERASE</span></div>
+      <pre>
+mp[k] = v;                         <span class="cmt">// insert/update</span>
+mp.<span class="fn">insert</span>({k, v});                 <span class="cmt">// insert only if key absent</span>
+mp.<span class="fn">emplace</span>(k, v);
+mp.<span class="fn">insert_or_assign</span>(k, v);        <span class="cmt">// always overwrite C++17</span>
+
+mp.<span class="fn">erase</span>(k);                       <span class="cmt">// erase by key</span>
+mp.<span class="fn">erase</span>(it);                      <span class="cmt">// erase by iterator</span>
+mp.<span class="fn">erase</span>(mp.<span class="fn">begin</span>(), mp.<span class="fn">end</span>());   <span class="cmt">// clear range</span>
+mp.<span class="fn">clear</span>();
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-acc">ACCESS</span> <span class="badge b-srch" style="margin-left:4px;">SEARCH</span></div>
+      <pre>
+mp[k]                              <span class="cmt">// value (inserts default if missing!)</span>
+mp.<span class="fn">at</span>(k)                          <span class="cmt">// throws if missing</span>
+mp.<span class="fn">count</span>(k)                       <span class="cmt">// 0 or 1</span>
+mp.<span class="fn">find</span>(k)                        <span class="cmt">// iterator or end()</span>
+
+<span class="cmt">// Ordered-only operations:</span>
+mp.<span class="fn">lower_bound</span>(k)                 <span class="cmt">// first key >= k</span>
+mp.<span class="fn">upper_bound</span>(k)                 <span class="cmt">// first key > k</span>
+mp.<span class="fn">equal_range</span>(k)                 <span class="cmt">// pair of [lower, upper)</span>
+<span class="op">*</span>mp.<span class="fn">begin</span>()                       <span class="cmt">// smallest key pair</span>
+<span class="op">*</span>mp.<span class="fn">rbegin</span>()                      <span class="cmt">// largest key pair</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-iter">ITERATE</span> <span class="badge b-misc" style="margin-left:4px;">MISC</span></div>
+      <pre>
+<span class="cmt">// In sorted key order:</span>
+<span class="kw">for</span> (<span class="kw">auto</span><span class="op">&amp;</span> [k, v] : mp) cout <span class="op">&lt;&lt;</span> k <span class="op">&lt;&lt;</span> <span class="str">":"</span> <span class="op">&lt;&lt;</span> v;
+
+<span class="cmt">// Reverse order:</span>
+<span class="kw">for</span> (<span class="kw">auto</span> it = mp.<span class="fn">rbegin</span>(); it <span class="op">!=</span> mp.<span class="fn">rend</span>(); it++)
+    cout <span class="op">&lt;&lt;</span> it<span class="op">-&gt;</span>first;
+
+mp.<span class="fn">size</span>() <span class="cmt">/</span> mp.<span class="fn">empty</span>()
+<span class="fn">swap</span>(mp1, mp2);
+
+<span class="cmt">// multimap (duplicate keys allowed):</span>
+<span class="str">multimap</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt; mmp;
+mmp.<span class="fn">insert</span>({<span class="num">1</span>,<span class="num">10</span>}); mmp.<span class="fn">insert</span>({<span class="num">1</span>,<span class="num">20</span>});
+<span class="kw">auto</span> [lo, hi] = mmp.<span class="fn">equal_range</span>(<span class="num">1</span>);
+      </pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ UNORDERED_SET ═════ -->
+<div class="section" id="uset">
+  <div class="section-header">
+    <h2>unordered_set&lt;T&gt;</h2>
+    <span class="include">#include &lt;unordered_set&gt;</span>
+    <span class="complexity-note">Average O(1) insert/find/erase · No duplicates · No ordering</span>
+  </div>
+  <div class="ops-grid">
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">INIT</span> <span class="badge b-ins" style="margin-left:4px;">INSERT</span></div>
+      <pre>
+<span class="str">unordered_set</span>&lt;<span class="kw">int</span>&gt; us;
+<span class="str">unordered_set</span>&lt;<span class="kw">int</span>&gt; us2 = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>};
+<span class="str">unordered_set</span>&lt;<span class="kw">int</span>&gt; us3(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>()); <span class="cmt">// from vector</span>
+
+us.<span class="fn">insert</span>(<span class="num">5</span>);                      <span class="cmt">// O(1) avg</span>
+us.<span class="fn">emplace</span>(<span class="num">5</span>);
+us.<span class="fn">insert</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());     <span class="cmt">// insert range</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-del">ERASE</span> <span class="badge b-srch" style="margin-left:4px;">SEARCH</span> <span class="badge b-iter" style="margin-left:4px;">ITERATE</span></div>
+      <pre>
+us.<span class="fn">erase</span>(<span class="num">5</span>);                       <span class="cmt">// by value O(1)</span>
+us.<span class="fn">erase</span>(it);                      <span class="cmt">// by iterator</span>
+us.<span class="fn">clear</span>();
+
+us.<span class="fn">count</span>(<span class="num">5</span>)                        <span class="cmt">// 0 or 1 (existence check)</span>
+us.<span class="fn">find</span>(<span class="num">5</span>)                         <span class="cmt">// iterator or end()</span>
+us.<span class="fn">contains</span>(<span class="num">5</span>)                     <span class="cmt">// C++20</span>
+us.<span class="fn">size</span>() <span class="cmt">/</span> us.<span class="fn">empty</span>()
+
+<span class="kw">for</span> (<span class="kw">auto</span> x : us) cout <span class="op">&lt;&lt;</span> x;      <span class="cmt">// unordered!</span>
+      </pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ SET ═════ -->
+<div class="section" id="set">
+  <div class="section-header">
+    <h2>set&lt;T&gt; &nbsp;(ordered)</h2>
+    <span class="include">#include &lt;set&gt;</span>
+    <span class="complexity-note">All operations O(log n) · Sorted · Unique elements · BST internally</span>
+  </div>
+  <div class="ops-grid">
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">INIT</span> <span class="badge b-ins" style="margin-left:4px;">INSERT</span></div>
+      <pre>
+<span class="str">set</span>&lt;<span class="kw">int</span>&gt; s;
+<span class="str">set</span>&lt;<span class="kw">int</span>&gt; s2 = {<span class="num">3</span>,<span class="num">1</span>,<span class="num">4</span>,<span class="num">1</span>,<span class="num">5</span>};       <span class="cmt">// {1,3,4,5} dedup+sort</span>
+<span class="str">set</span>&lt;<span class="kw">int</span>,<span class="fn">greater</span>&lt;<span class="kw">int</span>&gt;&gt; s3;          <span class="cmt">// descending order</span>
+<span class="str">set</span>&lt;<span class="kw">int</span>&gt; s4(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());   <span class="cmt">// from vector</span>
+
+s.<span class="fn">insert</span>(<span class="num">5</span>);                        <span class="cmt">// O(log n), ignored if exists</span>
+s.<span class="fn">emplace</span>(<span class="num">5</span>);
+<span class="kw">auto</span> [it, ok] = s.<span class="fn">insert</span>(<span class="num">5</span>);       <span class="cmt">// ok=false if already existed</span>
+s.<span class="fn">insert</span>(v.<span class="fn">begin</span>(), v.<span class="fn">end</span>());       <span class="cmt">// insert range</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-del">ERASE</span> <span class="badge b-acc" style="margin-left:4px;">ACCESS</span></div>
+      <pre>
+s.<span class="fn">erase</span>(<span class="num">5</span>);                         <span class="cmt">// by value O(log n)</span>
+s.<span class="fn">erase</span>(it);                        <span class="cmt">// by iterator O(1)</span>
+s.<span class="fn">erase</span>(s.<span class="fn">begin</span>(), s.<span class="fn">find</span>(<span class="num">5</span>));    <span class="cmt">// erase range</span>
+s.<span class="fn">clear</span>();
+
+<span class="op">*</span>s.<span class="fn">begin</span>()                          <span class="cmt">// smallest element</span>
+<span class="op">*</span>s.<span class="fn">rbegin</span>()                         <span class="cmt">// largest element</span>
+<span class="op">*</span><span class="fn">prev</span>(s.<span class="fn">end</span>())                      <span class="cmt">// largest (alternative)</span>
+s.<span class="fn">size</span>() <span class="cmt">/</span> s.<span class="fn">empty</span>()
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-srch">SEARCH</span></div>
+      <pre>
+s.<span class="fn">count</span>(<span class="num">5</span>)                          <span class="cmt">// 0 or 1</span>
+s.<span class="fn">find</span>(<span class="num">5</span>)                           <span class="cmt">// iterator or end()</span>
+s.<span class="fn">contains</span>(<span class="num">5</span>)                       <span class="cmt">// C++20</span>
+s.<span class="fn">lower_bound</span>(<span class="num">5</span>)                   <span class="cmt">// iter to first element >= 5</span>
+s.<span class="fn">upper_bound</span>(<span class="num">5</span>)                   <span class="cmt">// iter to first element > 5</span>
+
+<span class="cmt">// Floor (largest element &lt;= x):</span>
+<span class="kw">auto</span> it = s.<span class="fn">upper_bound</span>(x);
+<span class="kw">if</span> (it <span class="op">!=</span> s.<span class="fn">begin</span>()) cout <span class="op">&lt;&lt;</span> <span class="op">*</span><span class="fn">prev</span>(it);
+
+<span class="cmt">// Ceil (smallest element >= x):</span>
+<span class="kw">auto</span> it2 = s.<span class="fn">lower_bound</span>(x);
+<span class="kw">if</span> (it2 <span class="op">!=</span> s.<span class="fn">end</span>()) cout <span class="op">&lt;&lt;</span> <span class="op">*</span>it2;
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-iter">ITERATE</span></div>
+      <pre>
+<span class="cmt">// Ascending (default):</span>
+<span class="kw">for</span> (<span class="kw">auto</span> x : s) cout <span class="op">&lt;&lt;</span> x;
+
+<span class="cmt">// Descending:</span>
+<span class="kw">for</span> (<span class="kw">auto</span> it = s.<span class="fn">rbegin</span>(); it <span class="op">!=</span> s.<span class="fn">rend</span>(); it++) cout <span class="op">&lt;&lt;</span> <span class="op">*</span>it;
+
+<span class="cmt">// Range [lo, hi):</span>
+<span class="kw">for</span> (<span class="kw">auto</span> it = s.<span class="fn">lower_bound</span>(lo);
+     it <span class="op">!=</span> s.<span class="fn">upper_bound</span>(hi); it++) cout <span class="op">&lt;&lt;</span> <span class="op">*</span>it;
+      </pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ MULTISET ═════ -->
+<div class="section" id="multiset">
+  <div class="section-header">
+    <h2>multiset&lt;T&gt;</h2>
+    <span class="include">#include &lt;set&gt;</span>
+    <span class="complexity-note">O(log n) all ops · Allows duplicates · Sorted · Sliding window median</span>
+  </div>
+  <div class="ops-grid">
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">INIT</span> <span class="badge b-ins" style="margin-left:4px;">INSERT</span> <span class="badge b-del" style="margin-left:4px;">ERASE</span></div>
+      <pre>
+<span class="str">multiset</span>&lt;<span class="kw">int</span>&gt; ms;
+<span class="str">multiset</span>&lt;<span class="kw">int</span>&gt; ms2 = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">2</span>,<span class="num">3</span>};
+<span class="str">multiset</span>&lt;<span class="kw">int</span>,<span class="fn">greater</span>&lt;<span class="kw">int</span>&gt;&gt; rms;     <span class="cmt">// max on top</span>
+
+ms.<span class="fn">insert</span>(<span class="num">5</span>);                       <span class="cmt">// always inserts (no dedup)</span>
+
+<span class="cmt">// ⚠ erase by VALUE removes ALL copies!</span>
+ms.<span class="fn">erase</span>(<span class="num">5</span>);                        <span class="cmt">// removes ALL 5s</span>
+
+<span class="cmt">// Erase ONE occurrence (correct way):</span>
+<span class="kw">auto</span> it = ms.<span class="fn">find</span>(<span class="num">5</span>);
+<span class="kw">if</span> (it <span class="op">!=</span> ms.<span class="fn">end</span>()) ms.<span class="fn">erase</span>(it);  <span class="cmt">// removes exactly one</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-srch">SEARCH</span> <span class="badge b-acc" style="margin-left:4px;">ACCESS</span> <span class="badge b-iter" style="margin-left:4px;">ITERATE</span></div>
+      <pre>
+ms.<span class="fn">count</span>(<span class="num">5</span>)                         <span class="cmt">// number of 5s O(log n + k)</span>
+ms.<span class="fn">find</span>(<span class="num">5</span>)                          <span class="cmt">// iterator to first 5</span>
+ms.<span class="fn">lower_bound</span>(<span class="num">5</span>)                  <span class="cmt">// first >= 5</span>
+ms.<span class="fn">upper_bound</span>(<span class="num">5</span>)                  <span class="cmt">// first > 5</span>
+ms.<span class="fn">equal_range</span>(<span class="num">5</span>)                  <span class="cmt">// pair of [lower, upper)</span>
+
+<span class="op">*</span>ms.<span class="fn">begin</span>()                         <span class="cmt">// minimum</span>
+<span class="op">*</span>ms.<span class="fn">rbegin</span>()                        <span class="cmt">// maximum</span>
+ms.<span class="fn">size</span>() <span class="cmt">/</span> ms.<span class="fn">empty</span>()
+
+<span class="kw">for</span> (<span class="kw">auto</span> x : ms) cout <span class="op">&lt;&lt;</span> x;       <span class="cmt">// sorted order</span>
+      </pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ PAIR & TUPLE ═════ -->
+<div class="section" id="pair">
+  <div class="section-header">
+    <h2>pair&lt;T1, T2&gt; &nbsp;&amp;&amp;&nbsp; tuple&lt;T...&gt;</h2>
+    <span class="include">#include &lt;utility&gt; / #include &lt;tuple&gt;</span>
+  </div>
+  <div class="ops-grid">
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">PAIR — INIT &amp; ACCESS</span></div>
+      <pre>
+<span class="str">pair</span>&lt;<span class="kw">int</span>,<span class="str">string</span>&gt; p1 = {<span class="num">1</span>, <span class="str">"hi"</span>};
+<span class="str">pair</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt; p2 = <span class="fn">make_pair</span>(<span class="num">3</span>, <span class="num">4</span>);
+<span class="kw">auto</span> p3 = <span class="fn">make_pair</span>(<span class="num">1</span>, <span class="str">"hello"</span>);    <span class="cmt">// type deduced</span>
+<span class="str">pair</span>&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt; p4(<span class="num">5</span>, <span class="num">10</span>);
+
+p1.first                            <span class="cmt">// access first</span>
+p1.second                           <span class="cmt">// access second</span>
+p1 = {<span class="num">2</span>, <span class="str">"bye"</span>};                   <span class="cmt">// reassign</span>
+<span class="fn">swap</span>(p1, p2);
+
+<span class="cmt">// Structured binding (C++17):</span>
+<span class="kw">auto</span> [a, b] = p2;
+<span class="kw">auto</span> [x, y] = <span class="fn">make_pair</span>(<span class="num">1</span>, <span class="num">2</span>);
+
+<span class="cmt">// Comparison (lexicographic, first then second):</span>
+p1 <span class="op">&lt;</span> p2 <span class="cmt">// compares first, then second</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-init">TUPLE — INIT &amp; ACCESS</span></div>
+      <pre>
+<span class="str">tuple</span>&lt;<span class="kw">int</span>,<span class="str">string</span>,<span class="kw">double</span>&gt; t1 = {<span class="num">1</span>,<span class="str">"hi"</span>,<span class="num">3.14</span>};
+<span class="kw">auto</span> t2 = <span class="fn">make_tuple</span>(<span class="num">1</span>, <span class="str">"hi"</span>, <span class="num">3.14</span>);
+
+<span class="fn">get</span>&lt;<span class="num">0</span>&gt;(t1)                          <span class="cmt">// 1st element</span>
+<span class="fn">get</span>&lt;<span class="num">1</span>&gt;(t1)                          <span class="cmt">// 2nd element</span>
+<span class="fn">get</span>&lt;<span class="kw">int</span>&gt;(t1)                        <span class="cmt">// by type (if unique)</span>
+
+<span class="cmt">// Structured binding (C++17):</span>
+<span class="kw">auto</span> [x, y, z] = t2;
+
+<span class="cmt">// tie (unpack into variables):</span>
+<span class="kw">int</span> a; <span class="str">string</span> b; <span class="kw">double</span> c;
+<span class="fn">tie</span>(a, b, c) = t2;
+<span class="fn">tie</span>(a, <span class="fn">ignore</span>, c) = t2;            <span class="cmt">// skip middle</span>
+
+<span class="fn">tuple_size</span>&lt;<span class="kw">decltype</span>(t1)&gt;::value    <span class="cmt">// 3 (compile-time)</span>
+<span class="fn">swap</span>(t1, t2);
+      </pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ ALGORITHM ═════ -->
+<div class="section" id="algo">
+  <div class="section-header">
+    <h2>&lt;algorithm&gt; &amp; &lt;numeric&gt; — key functions</h2>
+    <span class="include">#include &lt;algorithm&gt; / #include &lt;numeric&gt;</span>
+  </div>
+  <div class="ops-grid">
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-sort">SORT &amp; ORDER</span></div>
+      <pre>
+<span class="fn">sort</span>(b, e);                         <span class="cmt">// O(n log n)</span>
+<span class="fn">sort</span>(b, e, cmp);                    <span class="cmt">// custom comparator</span>
+<span class="fn">stable_sort</span>(b, e);                  <span class="cmt">// stable O(n log² n)</span>
+<span class="fn">partial_sort</span>(b, mid, e);           <span class="cmt">// first k sorted</span>
+<span class="fn">nth_element</span>(b, b+k, e);            <span class="cmt">// kth element O(n) avg</span>
+<span class="fn">reverse</span>(b, e);
+<span class="fn">rotate</span>(b, b+k, e);                 <span class="cmt">// left rotate by k</span>
+<span class="fn">next_permutation</span>(b, e);            <span class="cmt">// lexicographically next</span>
+<span class="fn">prev_permutation</span>(b, e);
+<span class="fn">is_sorted</span>(b, e);                   <span class="cmt">// true/false</span>
+<span class="fn">is_sorted_until</span>(b, e);             <span class="cmt">// iterator to first out-of-order</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-srch">SEARCH &amp; FIND</span></div>
+      <pre>
+<span class="fn">find</span>(b, e, val);                    <span class="cmt">// linear search, returns iter</span>
+<span class="fn">find_if</span>(b, e, pred);               <span class="cmt">// first matching pred</span>
+<span class="fn">find_if_not</span>(b, e, pred);
+<span class="fn">binary_search</span>(b, e, val);          <span class="cmt">// true/false (sorted only)</span>
+<span class="fn">lower_bound</span>(b, e, val);            <span class="cmt">// iter to first >= val</span>
+<span class="fn">upper_bound</span>(b, e, val);            <span class="cmt">// iter to first >  val</span>
+<span class="fn">equal_range</span>(b, e, val);            <span class="cmt">// pair [lower, upper)</span>
+<span class="fn">search</span>(b1, e1, b2, e2);            <span class="cmt">// find subrange</span>
+<span class="fn">count</span>(b, e, val);                  <span class="cmt">// count occurrences</span>
+<span class="fn">count_if</span>(b, e, pred);
+<span class="fn">any_of</span>(b, e, pred);                <span class="cmt">// true if any matches</span>
+<span class="fn">all_of</span>(b, e, pred);                <span class="cmt">// true if all match</span>
+<span class="fn">none_of</span>(b, e, pred);
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">MIN / MAX / COMPARE</span></div>
+      <pre>
+<span class="fn">min</span>(a, b) <span class="cmt">/</span> <span class="fn">max</span>(a, b)
+<span class="fn">min</span>({a, b, c})                      <span class="cmt">// initializer list</span>
+<span class="fn">min_element</span>(b, e)                   <span class="cmt">// iterator to min</span>
+<span class="fn">max_element</span>(b, e)                   <span class="cmt">// iterator to max</span>
+<span class="fn">minmax</span>(a, b)                        <span class="cmt">// pair {min, max}</span>
+<span class="fn">minmax_element</span>(b, e)               <span class="cmt">// pair of iters</span>
+<span class="fn">clamp</span>(val, lo, hi)                  <span class="cmt">// C++17: lo <= val <= hi</span>
+<span class="fn">equal</span>(b1, e1, b2)                   <span class="cmt">// two ranges equal?</span>
+<span class="fn">lexicographical_compare</span>(b1,e1,b2,e2) <span class="cmt">// dict compare</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">NUMERIC (&lt;numeric&gt;)</span></div>
+      <pre>
+<span class="fn">accumulate</span>(b, e, init)             <span class="cmt">// sum with initial value</span>
+<span class="fn">accumulate</span>(b, e, <span class="num">1</span>, multiplies&lt;&gt;()) <span class="cmt">// product</span>
+<span class="fn">partial_sum</span>(b, e, out)             <span class="cmt">// prefix sums</span>
+<span class="fn">adjacent_difference</span>(b, e, out)     <span class="cmt">// differences</span>
+<span class="fn">inner_product</span>(b1,e1,b2,init)       <span class="cmt">// dot product</span>
+<span class="fn">iota</span>(b, e, start)                  <span class="cmt">// fill: start, start+1, ...</span>
+<span class="fn">reduce</span>(b, e)                        <span class="cmt">// C++17: parallel-friendly sum</span>
+<span class="fn">gcd</span>(a, b) <span class="cmt">/</span> <span class="fn">lcm</span>(a, b)             <span class="cmt">// C++17</span>
+<span class="fn">abs</span>(x) <span class="cmt">/</span> <span class="fn">pow</span>(x, n) <span class="cmt">/</span> <span class="fn">sqrt</span>(x) <span class="cmt">/ </span><span class="fn">log</span>(x) <span class="cmt">(&lt;cmath&gt;)</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">MODIFY &amp; COPY</span></div>
+      <pre>
+<span class="fn">fill</span>(b, e, val);                    <span class="cmt">// set all to val</span>
+<span class="fn">fill_n</span>(b, n, val);                  <span class="cmt">// fill n elements</span>
+<span class="fn">copy</span>(b, e, out);                    <span class="cmt">// copy to output</span>
+<span class="fn">copy_if</span>(b, e, out, pred);
+<span class="fn">copy_n</span>(b, n, out);
+<span class="fn">move</span>(b, e, out);                    <span class="cmt">// move range</span>
+<span class="fn">transform</span>(b, e, out, fn);          <span class="cmt">// map function</span>
+<span class="fn">transform</span>(b1,e1,b2,out,fn);        <span class="cmt">// binary transform</span>
+<span class="fn">replace</span>(b, e, old_v, new_v);
+<span class="fn">replace_if</span>(b, e, pred, new_v);
+<span class="fn">swap_ranges</span>(b1, e1, b2);
+<span class="fn">remove</span>(b, e, val);                  <span class="cmt">// logical remove, use erase-remove!</span>
+<span class="fn">remove_if</span>(b, e, pred);
+<span class="fn">unique</span>(b, e);                       <span class="cmt">// remove consecutive dups</span>
+      </pre>
+    </div>
+
+    <div class="op-block">
+      <div class="op-label"><span class="badge b-misc">SET OPERATIONS (on sorted ranges)</span></div>
+      <pre>
+<span class="fn">set_union</span>(b1,e1,b2,e2,out);
+<span class="fn">set_intersection</span>(b1,e1,b2,e2,out);
+<span class="fn">set_difference</span>(b1,e1,b2,e2,out);
+<span class="fn">set_symmetric_difference</span>(b1,e1,b2,e2,out);
+<span class="fn">includes</span>(b1,e1,b2,e2);             <span class="cmt">// is [b2,e2) subset of [b1,e1)?</span>
+<span class="fn">merge</span>(b1,e1,b2,e2,out);            <span class="cmt">// merge two sorted ranges</span>
+<span class="fn">inplace_merge</span>(b, mid, e);          <span class="cmt">// merge in-place</span>
+
+<span class="cmt">// Heap operations:</span>
+<span class="fn">make_heap</span>(b, e);                   <span class="cmt">// heapify O(n)</span>
+<span class="fn">push_heap</span>(b, e);                   <span class="cmt">// push last element up</span>
+<span class="fn">pop_heap</span>(b, e);                    <span class="cmt">// move max to end</span>
+<span class="fn">sort_heap</span>(b, e);                   <span class="cmt">// heap sort</span>
+<span class="fn">is_heap</span>(b, e);
+      </pre>
+    </div>
+
+  </div>
+  <div class="section-note">
+    All algorithm functions work with iterators. For custom containers, pass .begin() and .end(). Use back_inserter(v) as output iterator when growing a vector.
+  </div>
+</div>
+
+<!-- Footer -->
+<div style="margin-top:24px;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:11px;color:var(--muted);line-height:1.8;">
+  <strong style="color:var(--text);">Quick tips:</strong><br>
+  · Always use <span style="color:var(--accent);font-family:monospace;">long long</span> for sums that may exceed 2³¹ (~2.1B). &nbsp;
+  · <span style="color:var(--accent);font-family:monospace;">unordered_*</span> containers can degrade to O(n) with hash collisions — use <span style="color:var(--accent);font-family:monospace;">reserve()</span> and custom hash for large inputs. &nbsp;
+  · <span style="color:var(--accent);font-family:monospace;">mp[key]</span> on an unordered_map/map silently inserts a default value if key is missing — use <span style="color:var(--accent);font-family:monospace;">count()</span> or <span style="color:var(--accent);font-family:monospace;">find()</span> to check first. &nbsp;
+  · <span style="color:var(--accent);font-family:monospace;">multiset::erase(val)</span> removes ALL copies — use <span style="color:var(--accent);font-family:monospace;">erase(find(val))</span> to remove exactly one. &nbsp;
+  · <span style="color:var(--accent);font-family:monospace;">stack::pop()</span> and <span style="color:var(--accent);font-family:monospace;">queue::pop()</span> return void — always call <span style="color:var(--accent);font-family:monospace;">top()/front()</span> first. &nbsp;
+  · <span style="color:var(--accent);font-family:monospace;">unique()</span> only removes consecutive duplicates — sort first if you want full dedup. &nbsp;
+  · Include <span style="color:var(--accent);font-family:monospace;">#include &lt;bits/stdc++.h&gt;</span> to get everything in one line (GCC only).
+</div>
+
+</div><!-- /main -->
+</body>
+</html>
